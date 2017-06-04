@@ -1,0 +1,22 @@
+{
+  "directory": {
+    "source": "src",
+    "component": "components",
+    "script": "js",
+    "style": "less",
+    "image": "images",
+    "staticData": "json",
+    "container": "containers",
+    "redux": "redux",
+    "reduxStore": "store",
+    "config": "configs",
+    "util": "utils",
+    "dist": "dist"
+  },
+  "saga": {
+    "urlPrefix": "Api.",
+    "urlSuffix": "",
+    "method": "get",
+    "extraImport": "import Api from '../config/api';"
+  }
+}
