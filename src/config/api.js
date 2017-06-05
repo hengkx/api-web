@@ -1,3 +1,4 @@
 export default {
-  Project: '/api/project'
+  Project: '/api/project',
+  User: '/api/user',
 };

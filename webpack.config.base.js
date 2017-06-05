@@ -72,7 +72,6 @@ export default {
       inject: true,
       template: './src/index.ejs',
       title: 'React Boilerplate',
-      favicon: './src/favicon.ico',
       minify: {
         collapseBooleanAttributes: true,
         collapseInlineTagWhitespace: true,
