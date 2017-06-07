@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import JSEncrypt from 'jsencrypt';
 import { Form, Input, Checkbox, Button } from 'antd';
 import { Link } from 'react-router';
+import { rsa } from '../../utils';
 
 const FormItem = Form.Item;
 
@@ -55,15 +55,8 @@ class SignUp extends React.Component {
     e.preventDefault();
     this.props.form.validateFields((err, values) => {
       if (!err) {
-        const encrypt = new JSEncrypt.JSEncrypt();
+        const password = rsa.encrypt(values.password);
 
-        encrypt.setPublicKey(`-----BEGIN PUBLIC KEY-----
-MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDwM2xWXTxblmLsUtr8Hg+pPsad
-bEDH2XPbXaMCGzSGtZNwg2wOMqC0c7hvFs71CEpiKp8rwX3+c/UbdX0q8bXmoaPI
-vOb2FZCuD9iLGjieXW/9MdKBtAIclwqIeedSgCN18e7J204asNBVc5vsuv5C/ckf
-6cQJv7apMIjggdXMCwIDAQAB
------END PUBLIC KEY-----`);
-        const password = encrypt.encrypt(values.password);
         this.props.signUp({
           username: values.username,
           password,
