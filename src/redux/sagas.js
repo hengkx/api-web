@@ -1,11 +1,13 @@
+import { watchSignUpSaga, watchCheckUsernameExistSaga, watchSignInSaga } from './account';
 import { watchGetAllProjectSaga, watchAddProjectSaga, watchGetProjectByIdSaga } from './project';
-import { watchRegistSaga } from './account';
 
 export default function* rootSaga() {
   yield [
+    watchSignUpSaga(),
+    watchCheckUsernameExistSaga(),
+    watchSignInSaga(),
     watchGetAllProjectSaga(),
     watchAddProjectSaga(),
-    watchGetProjectByIdSaga(),
-    watchRegistSaga()
+    watchGetProjectByIdSaga()
   ];
 }

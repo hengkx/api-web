@@ -1,4 +1,5 @@
-import Regist from './Regist';
+import SignIn from './SignIn';
+import SignUp from './SignUp';
 
-export default {};
-export { Regist };
+export default { SignIn, SignUp };
+export { SignIn, SignUp };

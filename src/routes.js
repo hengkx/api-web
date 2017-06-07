@@ -28,11 +28,19 @@ export default [
     ]
   },
   {
-    path: 'regist',
+    path: 'signin',
     getComponent: (nextState, cb) => {
       require.ensure([], (require) => {
-        cb(null, withRouter(require('./containers/Regist')));
-      }, 'regist');
+        cb(null, withRouter(require('./containers/SignIn')));
+      }, 'signin');
+    }
+  },
+  {
+    path: 'signup',
+    getComponent: (nextState, cb) => {
+      require.ensure([], (require) => {
+        cb(null, withRouter(require('./containers/SignUp')));
+      }, 'signup');
     }
   }
 ];
