@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Form, Input, message, Button } from 'antd';
-import { Link } from 'react-router';
+import { browserHistory, Link } from 'react-router';
 import { rsa } from '../../utils';
 
 const FormItem = Form.Item;
@@ -38,6 +38,8 @@ class SignIn extends React.Component {
       console.log(signInResult);
       if (signInResult.code !== 0) {
         message.error(signInResult.message);
+      } else {
+        browserHistory.push('/project');
       }
     }
   }
@@ -109,7 +111,7 @@ class SignIn extends React.Component {
           <Button type="primary" htmlType="submit" size="large">登录</Button>
         </FormItem>
         <FormItem {...tailFormItemLayout}>
-          没有帐号，<Link to="/signin">免费注册</Link>
+          没有帐号，<Link to="/signup">免费注册</Link>
         </FormItem>
       </Form>
     );

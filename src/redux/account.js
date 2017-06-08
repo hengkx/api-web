@@ -50,7 +50,7 @@ function* signUpSaga(data) {
   try {
     yield put(beginTask());
 
-    const res = yield call(axios.post, Api.User, data.payload);
+    const res = yield call(axios.post, Api.SignUp, data.payload);
 
     yield put(signUpResult(res));
   } catch (error) {

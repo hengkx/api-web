@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Form, Input, Checkbox, Button } from 'antd';
-import { Link } from 'react-router';
+import { Form, Input, Row, Col, Checkbox, Button, message } from 'antd';
+import { browserHistory, Link } from 'react-router';
 import { rsa } from '../../utils';
 
 const FormItem = Form.Item;
@@ -38,7 +38,11 @@ class SignUp extends React.Component {
   componentWillReceiveProps(nextProps) {
     const { signUpResult, checkUsernameExistResult } = nextProps;
     if (signUpResult !== this.props.signUpResult) {
-      console.log(signUpResult);
+      if (signUpResult.code !== 0) {
+        message.error(signUpResult.message);
+      } else {
+        browserHistory.push('/signin');
+      }
     }
     if (checkUsernameExistResult !== this.props.checkUsernameExistResult) {
       if (checkUsernameExistResult.code !== 0) {
@@ -141,13 +145,21 @@ class SignUp extends React.Component {
           label="邮箱"
           hasFeedback
         >
-          {getFieldDecorator('email', {
-            rules: [
-              { type: 'email', message: '请输入正确的邮箱!' },
-              { required: true, message: '请输入邮箱!' }
-            ]
-          })(<Input />)}
+          <Row gutter={8}>
+            <Col span={16}>
+              {getFieldDecorator('email', {
+                rules: [
+                  { type: 'email', message: '请输入正确的邮箱!' },
+                  { required: true, message: '请输入邮箱!' }
+                ]
+              })(<Input />)}
+            </Col>
+            <Col span={8}>
+              <Button size="large">获取验证码</Button>
+            </Col>
+          </Row>
         </FormItem>
+
         <FormItem
           {...formItemLayout}
           label="密码"
