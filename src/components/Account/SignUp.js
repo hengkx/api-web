@@ -16,27 +16,33 @@ class SignUp extends React.Component {
       getFieldsValue: PropTypes.func.isRequired,
       getFieldValue: PropTypes.func.isRequired,
       setFields: PropTypes.func.isRequired,
+      getFieldError: PropTypes.func.isRequired,
+      isFieldTouched: PropTypes.func.isRequired,
     }).isRequired,
     signUp: PropTypes.func.isRequired,
+    sendEmailCode: PropTypes.func.isRequired,
     checkUsernameExist: PropTypes.func.isRequired,
     signUpResult: PropTypes.shape({ code: PropTypes.number.isRequired }),
+    sendEmailCodeResult: PropTypes.shape({ code: PropTypes.number.isRequired }),
     checkUsernameExistResult: PropTypes.shape({ code: PropTypes.number.isRequired }),
   }
 
   static defaultProps = {
     signUpResult: undefined,
-    checkUsernameExistResult: undefined
+    checkUsernameExistResult: undefined,
+    sendEmailCodeResult: undefined
   }
 
   constructor(props) {
     super(props);
     this.state = {
-      confirmDirty: false
+      confirmDirty: false,
+      sendEmailCode: '获取验证码'
     };
   }
 
   componentWillReceiveProps(nextProps) {
-    const { signUpResult, checkUsernameExistResult } = nextProps;
+    const { signUpResult, checkUsernameExistResult, sendEmailCodeResult } = nextProps;
     if (signUpResult !== this.props.signUpResult) {
       if (signUpResult.code !== 0) {
         message.error(signUpResult.message);
@@ -44,6 +50,12 @@ class SignUp extends React.Component {
         browserHistory.push('/signin');
       }
     }
+    if (sendEmailCodeResult !== this.props.sendEmailCodeResult) {
+      if (sendEmailCodeResult.code !== 0) {
+        message.error(sendEmailCodeResult.message);
+      }
+    }
+
     if (checkUsernameExistResult !== this.props.checkUsernameExistResult) {
       if (checkUsernameExistResult.code !== 0) {
         this.props.form.setFields({
@@ -55,6 +67,31 @@ class SignUp extends React.Component {
       }
     }
   }
+
+  componentWillUnmount() {
+    clearInterval(this.timer);
+  }
+
+
+  handleSendEmailCodeClick = () => {
+    if (!this.timer) {
+      this.time = 60;
+      this.timer = setInterval(() => {
+        this.setState({ sendEmailCode: `${this.time}s后重新发送` });
+        if (this.time === 0) {
+          this.setState({ sendEmailCode: '获取验证码' });
+          clearTimeout(this.timer);
+          this.timer = null;
+        }
+        this.time -= 1;
+      }, 1000);
+
+      const to = this.props.form.getFieldValue('email');
+      this.props.sendEmailCode({ to });
+    }
+  }
+
+
   handleSubmit = (e) => {
     e.preventDefault();
     this.props.form.validateFields((err, values) => {
@@ -64,6 +101,7 @@ class SignUp extends React.Component {
         this.props.signUp({
           username: values.username,
           password,
+          code: values.code,
           email: values.email
         });
       }
@@ -102,7 +140,7 @@ class SignUp extends React.Component {
     callback();
   }
   render() {
-    const { getFieldDecorator } = this.props.form;
+    const { getFieldDecorator, getFieldError, isFieldTouched } = this.props.form;
     const formItemLayout = {
       labelCol: {
         xs: { span: 24 },
@@ -125,6 +163,7 @@ class SignUp extends React.Component {
         },
       },
     };
+    const { sendEmailCode } = this.state;
     return (
       <Form onSubmit={this.handleSubmit}>
         <FormItem
@@ -143,7 +182,6 @@ class SignUp extends React.Component {
         <FormItem
           {...formItemLayout}
           label="邮箱"
-          hasFeedback
         >
           <Row gutter={8}>
             <Col span={16}>
@@ -155,11 +193,21 @@ class SignUp extends React.Component {
               })(<Input />)}
             </Col>
             <Col span={8}>
-              <Button size="large">获取验证码</Button>
+              <Button disabled={!isFieldTouched('email') || getFieldError('email') || sendEmailCode !== '获取验证码'} size="large" onClick={this.handleSendEmailCodeClick}>{sendEmailCode}</Button>
             </Col>
           </Row>
         </FormItem>
-
+        <FormItem
+          {...formItemLayout}
+          label="验证码"
+          hasFeedback
+        >
+          {getFieldDecorator('code', {
+            rules: [
+              { required: true, message: '请输入验证码!' }
+            ]
+          })(<Input />)}
+        </FormItem>
         <FormItem
           {...formItemLayout}
           label="密码"

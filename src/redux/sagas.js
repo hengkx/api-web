@@ -1,5 +1,6 @@
 import { watchSignUpSaga, watchCheckUsernameExistSaga, watchSignInSaga } from './account';
 import { watchGetAllProjectSaga, watchAddProjectSaga, watchGetProjectByIdSaga } from './project';
+import { watchSendEmailCodeSaga } from './email';
 
 export default function* rootSaga() {
   yield [
@@ -8,6 +9,7 @@ export default function* rootSaga() {
     watchSignInSaga(),
     watchGetAllProjectSaga(),
     watchAddProjectSaga(),
-    watchGetProjectByIdSaga()
+    watchGetProjectByIdSaga(),
+    watchSendEmailCodeSaga()
   ];
 }

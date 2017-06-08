@@ -95,7 +95,7 @@ class Detail extends React.Component {
                         <Input
                           key={urlGroup.id}
                           addonBefore={urlGroup.name}
-                          defaultValue={find(urlGroup.urls, { envId: item.id }).url}
+                          defaultValue={find(urlGroup.urls, { env_id: item.id }).url}
                         />
                       ))
                     }

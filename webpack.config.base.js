@@ -71,7 +71,7 @@ export default {
     new HtmlPlugin({
       inject: true,
       template: './src/index.ejs',
-      title: 'React Boilerplate',
+      title: 'Api Doc',
       minify: {
         collapseBooleanAttributes: true,
         collapseInlineTagWhitespace: true,
