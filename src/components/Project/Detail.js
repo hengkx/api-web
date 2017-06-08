@@ -1,7 +1,22 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Tabs, Form, Input } from 'antd';
+import { Tabs, Form, Input, Table } from 'antd';
 import find from 'lodash/find';
+import moment from 'moment';
+import EditableCell from './EditableCell';
+
+const timeColumns = [
+  {
+    title: '创建时间',
+    dataIndex: 'create_date',
+    render: (text) => moment(text).format('YYYY-MM-DD HH:mm:ss')
+  },
+  {
+    title: '最后修改时间',
+    dataIndex: 'update_date',
+    render: (text) => moment(text).format('YYYY-MM-DD HH:mm:ss')
+  }
+];
 
 const TabPane = Tabs.TabPane;
 const FormItem = Form.Item;
@@ -19,18 +34,13 @@ class Detail extends React.Component {
       getFieldsValue: PropTypes.func.isRequired,
     }).isRequired,
     getProjectById: PropTypes.func.isRequired,
-    addProject: PropTypes.func.isRequired,
     getProjectByIdResult: PropTypes.shape({
-      code: PropTypes.number.isRequired
-    }),
-    addProjectResult: PropTypes.shape({
       code: PropTypes.number.isRequired
     })
   };
 
   static defaultProps = {
     getProjectByIdResult: undefined,
-    addProjectResult: undefined
   };
 
 
@@ -52,6 +62,45 @@ class Detail extends React.Component {
     }
   }
 
+  onCellChange = (urlGroupIndex, urlIndex, key) => {
+    return (value) => {
+      const { project } = this.state;
+      const dataSource = [...project.urlGroups[urlGroupIndex].urls];
+      dataSource[urlIndex][key] = value;
+      this.setState({ dataSource });
+    };
+  }
+
+  expandedRowRender = (item, urlGroupIndex) => {
+    const { envs } = this.state.project;
+    const columns = [
+      {
+        title: '环境',
+        dataIndex: 'env_id',
+        render: (value) => find(envs, { id: value }).name
+      },
+      {
+        title: '链接',
+        dataIndex: 'url',
+        render: (text, record, urlIndex) => (
+          <EditableCell
+            value={text}
+            onChange={this.onCellChange(urlGroupIndex, urlIndex, 'url')}
+          />)
+      },
+      ...timeColumns
+    ];
+
+    return (
+      <Table
+        rowKey="id"
+        columns={columns}
+        dataSource={item.urls}
+        pagination={false}
+      />
+    );
+  };
+
   render() {
     const { project } = this.state;
     const { getFieldDecorator } = this.props.form;
@@ -59,6 +108,22 @@ class Detail extends React.Component {
       labelCol: { span: 4 },
       wrapperCol: { span: 18 },
     };
+
+    const urlGroupColumns = [
+      {
+        title: '名称',
+        dataIndex: 'name',
+      },
+      ...timeColumns
+    ];
+
+    const envColumns = [
+      {
+        title: '名称',
+        dataIndex: 'name',
+      },
+      ...timeColumns
+    ];
     return (
       <div>
         <Tabs defaultActiveKey="3">
@@ -85,7 +150,19 @@ class Detail extends React.Component {
                 })(<Input />)}
               </FormItem>
             </Form>
-
+            <Table
+              rowKey="id"
+              pagination={false}
+              columns={urlGroupColumns}
+              dataSource={project.urlGroups}
+              expandedRowRender={this.expandedRowRender}
+            />
+            <Table
+              rowKey="id"
+              pagination={false}
+              columns={envColumns}
+              dataSource={project.envs}
+            />
             <Tabs defaultActiveKey="default">
               {project.envs &&
                 project.envs.map(item => (
