@@ -8,6 +8,7 @@ const mapStateToProps = (state) => ({
   getProjectByIdResult: state.project.getProjectByIdResult,
   projectUpdateEnvResult: state.project.projectUpdateEnvResult,
   updateResult: state.urlGroup.updateResult,
+  updateUrlResult: state.urlGroup.updateUrlResult,
   isfetching: state.project.isfetching,
 });
 

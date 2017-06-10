@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Tabs, Form, Input, Table, message } from 'antd';
 import find from 'lodash/find';
-import cloneDeep from 'lodash/cloneDeep';
+import findIndex from 'lodash/findIndex';
 import moment from 'moment';
 import EditableCell from './EditableCell';
 import './less/detail.less';
@@ -37,10 +37,18 @@ class Detail extends React.Component {
     }).isRequired,
     getProjectById: PropTypes.func.isRequired,
     projectUpdateEnv: PropTypes.func.isRequired,
+    update: PropTypes.func.isRequired,
+    updateUrl: PropTypes.func.isRequired,
     getProjectByIdResult: PropTypes.shape({
       code: PropTypes.number.isRequired
     }),
     projectUpdateEnvResult: PropTypes.shape({
+      code: PropTypes.number.isRequired
+    }),
+    updateResult: PropTypes.shape({
+      code: PropTypes.number.isRequired
+    }),
+    updateUrlResult: PropTypes.shape({
       code: PropTypes.number.isRequired
     }),
   };
@@ -48,6 +56,8 @@ class Detail extends React.Component {
   static defaultProps = {
     getProjectByIdResult: undefined,
     projectUpdateEnvResult: undefined,
+    updateResult: undefined,
+    updateUrlResult: undefined,
   };
 
   constructor(props) {
@@ -62,7 +72,10 @@ class Detail extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    const { getProjectByIdResult, projectUpdateEnvResult } = nextProps;
+    const {
+      getProjectByIdResult, projectUpdateEnvResult,
+      updateResult, updateUrlResult
+    } = nextProps;
     if (getProjectByIdResult !== this.props.getProjectByIdResult) {
       this.setState({ project: getProjectByIdResult.data });
     }
@@ -73,21 +86,40 @@ class Detail extends React.Component {
         message.error(projectUpdateEnvResult.message);
       }
     }
+    if (updateUrlResult !== this.props.updateUrlResult) {
+      if (updateUrlResult.code === 0) {
+        this.urlGroupChange(updateUrlResult.data);
+      } else {
+        message.error(updateUrlResult.message);
+      }
+    }
+    if (updateResult !== this.props.updateResult) {
+      if (updateResult.code === 0) {
+        this.urlGroupChange(updateResult.data);
+      } else {
+        message.error(updateResult.message);
+      }
+    }
   }
 
-  onCellChange = (urlGroupIndex, urlIndex, key) => {
-    return (value) => {
-      const { project } = this.state;
-      const dataSource = [...project.urlGroups[urlGroupIndex].urls];
-      dataSource[urlIndex][key] = value;
-      // this.setState({ dataSource });
-      this.props.updateUrl({
-        ...dataSource[urlIndex],
-        [key]: value,
-        urlGroupId: project.urlGroups[urlGroupIndex].id
-      });
-    };
+  urlGroupChange = (urlGroup) => {
+    const project = this.state.project;
+    const index = findIndex(project.urlGroups, { id: urlGroup.id });
+    if (index !== -1) {
+      project.urlGroups[index] = urlGroup;
+    }
+    this.setState({ project });
   }
+
+  onUrlCellChange = (urlGroupIndex, urlIndex, key) => ((value) => {
+    const { project } = this.state;
+    const dataSource = [...project.urlGroups[urlGroupIndex].urls];
+    this.props.updateUrl({
+      ...dataSource[urlIndex],
+      [key]: value,
+      urlGroupId: project.urlGroups[urlGroupIndex].id
+    });
+  })
   onEnvCellChange = (index, key) => ((value) => {
     const { project } = this.state;
     const dataSource = [...project.envs];
@@ -122,7 +154,7 @@ class Detail extends React.Component {
         render: (text, record, urlIndex) => (
           <EditableCell
             value={text}
-            onChange={this.onCellChange(urlGroupIndex, urlIndex, 'url')}
+            onChange={this.onUrlCellChange(urlGroupIndex, urlIndex, 'url')}
           />)
       },
       ...timeColumns
