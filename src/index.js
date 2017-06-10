@@ -5,6 +5,7 @@ import axios from 'axios';
 import { browserHistory } from 'react-router';
 import isObject from 'lodash/isObject';
 import { message } from 'antd';
+// import pathToRegexp from 'path-to-regexp';
 import App from './App';
 
 if (process.env.NODE_ENV === 'development') {

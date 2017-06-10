@@ -1,21 +1,42 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Input, Icon } from 'antd';
 import './less/editableCell.less';
 
 class EditableCell extends React.Component {
-  state = {
-    value: this.props.value,
-    editable: false,
+  static propTypes = {
+    value: PropTypes.any,
+    onChange: PropTypes.func
   }
+
+  static defaultProps = {
+    value: '',
+    onChange: () => { }
+  }
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      value: this.props.value,
+      editable: false,
+    };
+  }
+
+  componentWillReceiveProps(nextProps) {
+    const { value } = nextProps;
+    if (value !== this.props.value) {
+      this.setState({ value });
+    }
+  }
+
+
   handleChange = (e) => {
     const value = e.target.value;
     this.setState({ value });
   }
   check = () => {
     this.setState({ editable: false });
-    if (this.props.onChange) {
-      this.props.onChange(this.state.value);
-    }
+    this.props.onChange(this.state.value);
   }
   edit = () => {
     this.setState({ editable: true });

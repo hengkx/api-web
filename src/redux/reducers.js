@@ -4,11 +4,13 @@ import { nprogress } from 'redux-nprogress';
 import account from './account';
 import project from './project';
 import email from './email';
+import urlGroup from './urlGroup';
 
 export default combineReducers({
   routing: routerReducer,
   nprogress,
   account,
   project,
-  email
+  email,
+  urlGroup
 });

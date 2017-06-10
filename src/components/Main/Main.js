@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { Link } from 'react-router';
 import { Layout, Menu } from 'antd';
 import './less/main.less';
 
@@ -15,7 +16,7 @@ class Index extends React.Component {
     return (
       <Layout>
         <Header style={{ position: 'fixed', width: '100%' }}>
-          <div className="logo">API Doc</div>
+          <div className="logo"><Link to="/">API Doc</Link></div>
           <Menu
             theme="dark"
             mode="horizontal"

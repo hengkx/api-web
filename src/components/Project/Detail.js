@@ -1,9 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Tabs, Form, Input, Table } from 'antd';
+import { Tabs, Form, Input, Table, message } from 'antd';
 import find from 'lodash/find';
+import cloneDeep from 'lodash/cloneDeep';
 import moment from 'moment';
 import EditableCell from './EditableCell';
+import './less/detail.less';
 
 const timeColumns = [
   {
@@ -34,15 +36,19 @@ class Detail extends React.Component {
       getFieldsValue: PropTypes.func.isRequired,
     }).isRequired,
     getProjectById: PropTypes.func.isRequired,
+    projectUpdateEnv: PropTypes.func.isRequired,
     getProjectByIdResult: PropTypes.shape({
       code: PropTypes.number.isRequired
-    })
+    }),
+    projectUpdateEnvResult: PropTypes.shape({
+      code: PropTypes.number.isRequired
+    }),
   };
 
   static defaultProps = {
     getProjectByIdResult: undefined,
+    projectUpdateEnvResult: undefined,
   };
-
 
   constructor(props) {
     super(props);
@@ -56,9 +62,16 @@ class Detail extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    const { getProjectByIdResult } = nextProps;
+    const { getProjectByIdResult, projectUpdateEnvResult } = nextProps;
     if (getProjectByIdResult !== this.props.getProjectByIdResult) {
       this.setState({ project: getProjectByIdResult.data });
+    }
+    if (projectUpdateEnvResult !== this.props.projectUpdateEnvResult) {
+      if (projectUpdateEnvResult.code === 0) {
+        this.setState({ project: projectUpdateEnvResult.data });
+      } else {
+        message.error(projectUpdateEnvResult.message);
+      }
     }
   }
 
@@ -67,9 +80,33 @@ class Detail extends React.Component {
       const { project } = this.state;
       const dataSource = [...project.urlGroups[urlGroupIndex].urls];
       dataSource[urlIndex][key] = value;
-      this.setState({ dataSource });
+      // this.setState({ dataSource });
+      this.props.updateUrl({
+        ...dataSource[urlIndex],
+        [key]: value,
+        urlGroupId: project.urlGroups[urlGroupIndex].id
+      });
     };
   }
+  onEnvCellChange = (index, key) => ((value) => {
+    const { project } = this.state;
+    const dataSource = [...project.envs];
+
+    this.props.projectUpdateEnv({
+      projectId: project.id,
+      id: dataSource[index].id,
+      [key]: value
+    });
+  })
+  onUrlGroupCellChange = (index, key) => ((value) => {
+    const { project } = this.state;
+    const dataSource = [...project.urlGroups];
+
+    this.props.update({
+      ...dataSource[index],
+      [key]: value
+    }, { c: 1 });
+  })
 
   expandedRowRender = (item, urlGroupIndex) => {
     const { envs } = this.state.project;
@@ -113,6 +150,11 @@ class Detail extends React.Component {
       {
         title: '名称',
         dataIndex: 'name',
+        render: (text, record, index) => (
+          <EditableCell
+            value={text}
+            onChange={this.onUrlGroupCellChange(index, 'name')}
+          />)
       },
       ...timeColumns
     ];
@@ -121,11 +163,16 @@ class Detail extends React.Component {
       {
         title: '名称',
         dataIndex: 'name',
+        render: (text, record, index) => (
+          <EditableCell
+            value={text}
+            onChange={this.onEnvCellChange(index, 'name')}
+          />)
       },
       ...timeColumns
     ];
     return (
-      <div>
+      <div className="detail">
         <Tabs defaultActiveKey="3">
           <TabPane tab="接口文档" key="1">Content of Tab 1</TabPane>
           <TabPane tab="Tab 2" key="2">Content of Tab 2</TabPane>
@@ -150,6 +197,18 @@ class Detail extends React.Component {
                 })(<Input />)}
               </FormItem>
             </Form>
+            <div className="sub-title">
+              项目环境
+            </div>
+            <Table
+              rowKey="id"
+              pagination={false}
+              columns={envColumns}
+              dataSource={project.envs}
+            />
+            <div className="sub-title">
+              基本链接
+            </div>
             <Table
               rowKey="id"
               pagination={false}
@@ -157,29 +216,7 @@ class Detail extends React.Component {
               dataSource={project.urlGroups}
               expandedRowRender={this.expandedRowRender}
             />
-            <Table
-              rowKey="id"
-              pagination={false}
-              columns={envColumns}
-              dataSource={project.envs}
-            />
-            <Tabs defaultActiveKey="default">
-              {project.envs &&
-                project.envs.map(item => (
-                  <TabPane tab={item.name} key={item.name}>
-                    {project.urlGroups &&
-                      project.urlGroups.map(urlGroup => (
-                        <Input
-                          key={urlGroup.id}
-                          addonBefore={urlGroup.name}
-                          defaultValue={find(urlGroup.urls, { env_id: item.id }).url}
-                        />
-                      ))
-                    }
-                  </TabPane>
-                ))
-              }
-            </Tabs>
+
           </TabPane>
         </Tabs>
       </div>

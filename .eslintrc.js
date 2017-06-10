@@ -7,6 +7,7 @@ module.exports = {
     },
     "rules": {
         "arrow-parens": ["off"],
+        "no-script-url": ["off"],
         "compat/compat": "error",
         "consistent-return": "off",
         "comma-dangle": "off",

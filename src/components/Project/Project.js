@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Form, Input, Button, Modal, message, Table } from 'antd';
+import { Form, Input, Button, Modal, message, Table, Popconfirm } from 'antd';
 import moment from 'moment';
 import { Link } from 'react-router';
 import './less/project.less';
@@ -18,17 +18,22 @@ class Project extends React.Component {
     }).isRequired,
     getAllProject: PropTypes.func.isRequired,
     addProject: PropTypes.func.isRequired,
+    delProject: PropTypes.func.isRequired,
     getAllProjectResult: PropTypes.shape({
       code: PropTypes.number.isRequired
     }),
     addProjectResult: PropTypes.shape({
+      code: PropTypes.number.isRequired
+    }),
+    delProjectResult: PropTypes.shape({
       code: PropTypes.number.isRequired
     })
   };
 
   static defaultProps = {
     getAllProjectResult: undefined,
-    addProjectResult: undefined
+    addProjectResult: undefined,
+    delProjectResult: undefined
   };
 
   constructor(props) {
@@ -45,16 +50,24 @@ class Project extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    const { getAllProjectResult, addProjectResult } = nextProps;
+    const { getAllProjectResult, addProjectResult, delProjectResult } = nextProps;
     if (getAllProjectResult !== this.props.getAllProjectResult) {
       this.setState({ projects: getAllProjectResult.data });
     }
     if (addProjectResult !== this.props.addProjectResult) {
-      if (getAllProjectResult.code === 0) {
+      if (addProjectResult.code === 0) {
         message.success('新增项目成功');
         this.props.getAllProject();
       } else {
-        message.error(`新增项目失败 ${getAllProjectResult.message}`);
+        message.error(addProjectResult.message);
+      }
+    }
+    if (delProjectResult !== this.props.delProjectResult) {
+      if (delProjectResult.code === 0) {
+        message.success('删除项目成功');
+        this.props.getAllProject();
+      } else {
+        message.error(delProjectResult.message);
       }
     }
   }
@@ -73,6 +86,10 @@ class Project extends React.Component {
       }
     });
   }
+  handleDelClick = (id) => {
+    this.props.delProject(id);
+  }
+
   render() {
     const formItemLayout = {
       labelCol: { span: 6 },
@@ -100,6 +117,18 @@ class Project extends React.Component {
         title: '最后修改时间',
         dataIndex: 'update_date',
         render: (text) => moment(text).format('YYYY-MM-DD HH:mm:ss')
+      },
+      {
+        title: '操作',
+        dataIndex: 'id',
+        render: (value, item) => (<div>
+          <Popconfirm
+            title={`确认删除 ${item.name} 项目吗？`}
+            onConfirm={() => { this.handleDelClick(value); }}
+          >
+            <a href="javascript:'">删除</a>
+          </Popconfirm>
+        </div>)
       }
     ];
     return (
