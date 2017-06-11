@@ -1,10 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Tabs, Form, Input, Table, message } from 'antd';
-import find from 'lodash/find';
-import findIndex from 'lodash/findIndex';
 import moment from 'moment';
 import EditableCell from './EditableCell';
+import UrlGroup from '../../containers/UrlGroup';
 import './less/detail.less';
 
 const timeColumns = [
@@ -37,18 +36,10 @@ class Detail extends React.Component {
     }).isRequired,
     getProjectById: PropTypes.func.isRequired,
     projectUpdateEnv: PropTypes.func.isRequired,
-    update: PropTypes.func.isRequired,
-    updateUrl: PropTypes.func.isRequired,
     getProjectByIdResult: PropTypes.shape({
       code: PropTypes.number.isRequired
     }),
     projectUpdateEnvResult: PropTypes.shape({
-      code: PropTypes.number.isRequired
-    }),
-    updateResult: PropTypes.shape({
-      code: PropTypes.number.isRequired
-    }),
-    updateUrlResult: PropTypes.shape({
       code: PropTypes.number.isRequired
     }),
   };
@@ -56,8 +47,6 @@ class Detail extends React.Component {
   static defaultProps = {
     getProjectByIdResult: undefined,
     projectUpdateEnvResult: undefined,
-    updateResult: undefined,
-    updateUrlResult: undefined,
   };
 
   constructor(props) {
@@ -73,8 +62,7 @@ class Detail extends React.Component {
 
   componentWillReceiveProps(nextProps) {
     const {
-      getProjectByIdResult, projectUpdateEnvResult,
-      updateResult, updateUrlResult
+      getProjectByIdResult, projectUpdateEnvResult
     } = nextProps;
     if (getProjectByIdResult !== this.props.getProjectByIdResult) {
       this.setState({ project: getProjectByIdResult.data });
@@ -86,40 +74,8 @@ class Detail extends React.Component {
         message.error(projectUpdateEnvResult.message);
       }
     }
-    if (updateUrlResult !== this.props.updateUrlResult) {
-      if (updateUrlResult.code === 0) {
-        this.urlGroupChange(updateUrlResult.data);
-      } else {
-        message.error(updateUrlResult.message);
-      }
-    }
-    if (updateResult !== this.props.updateResult) {
-      if (updateResult.code === 0) {
-        this.urlGroupChange(updateResult.data);
-      } else {
-        message.error(updateResult.message);
-      }
-    }
   }
 
-  urlGroupChange = (urlGroup) => {
-    const project = this.state.project;
-    const index = findIndex(project.urlGroups, { id: urlGroup.id });
-    if (index !== -1) {
-      project.urlGroups[index] = urlGroup;
-    }
-    this.setState({ project });
-  }
-
-  onUrlCellChange = (urlGroupIndex, urlIndex, key) => ((value) => {
-    const { project } = this.state;
-    const dataSource = [...project.urlGroups[urlGroupIndex].urls];
-    this.props.updateUrl({
-      ...dataSource[urlIndex],
-      [key]: value,
-      urlGroupId: project.urlGroups[urlGroupIndex].id
-    });
-  })
   onEnvCellChange = (index, key) => ((value) => {
     const { project } = this.state;
     const dataSource = [...project.envs];
@@ -130,45 +86,6 @@ class Detail extends React.Component {
       [key]: value
     });
   })
-  onUrlGroupCellChange = (index, key) => ((value) => {
-    const { project } = this.state;
-    const dataSource = [...project.urlGroups];
-
-    this.props.update({
-      ...dataSource[index],
-      [key]: value
-    }, { c: 1 });
-  })
-
-  expandedRowRender = (item, urlGroupIndex) => {
-    const { envs } = this.state.project;
-    const columns = [
-      {
-        title: '环境',
-        dataIndex: 'env_id',
-        render: (value) => find(envs, { id: value }).name
-      },
-      {
-        title: '链接',
-        dataIndex: 'url',
-        render: (text, record, urlIndex) => (
-          <EditableCell
-            value={text}
-            onChange={this.onUrlCellChange(urlGroupIndex, urlIndex, 'url')}
-          />)
-      },
-      ...timeColumns
-    ];
-
-    return (
-      <Table
-        rowKey="id"
-        columns={columns}
-        dataSource={item.urls}
-        pagination={false}
-      />
-    );
-  };
 
   render() {
     const { project } = this.state;
@@ -177,19 +94,6 @@ class Detail extends React.Component {
       labelCol: { span: 4 },
       wrapperCol: { span: 18 },
     };
-
-    const urlGroupColumns = [
-      {
-        title: '名称',
-        dataIndex: 'name',
-        render: (text, record, index) => (
-          <EditableCell
-            value={text}
-            onChange={this.onUrlGroupCellChange(index, 'name')}
-          />)
-      },
-      ...timeColumns
-    ];
 
     const envColumns = [
       {
@@ -241,14 +145,7 @@ class Detail extends React.Component {
             <div className="sub-title">
               基本链接
             </div>
-            <Table
-              rowKey="id"
-              pagination={false}
-              columns={urlGroupColumns}
-              dataSource={project.urlGroups}
-              expandedRowRender={this.expandedRowRender}
-            />
-
+            <UrlGroup envs={project.envs} urlGroups={project.urlGroups} />
           </TabPane>
         </Tabs>
       </div>

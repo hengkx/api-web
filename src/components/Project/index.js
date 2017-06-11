@@ -1,6 +1,7 @@
 import Project from './Project';
-import Detail from './Detail';
 
-export { Detail };
+export { default as UrlGroup } from './UrlGroup';
+
+export { default as Detail } from './Detail';
 
 export default Project;
