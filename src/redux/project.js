@@ -29,18 +29,25 @@ const reduxRequests = ReduxReqs([
   },
   {
     type: 'PROJECT_ADD_ENV',
-    url: Api.EnvOper,
+    url: Api.ProjectEnvOper,
     method: 'post'
   },
   {
     type: 'PROJECT_UPDATE_ENV',
-    url: Api.EnvOper,
+    url: Api.ProjectEnvOper,
     method: 'put'
+  },
+  {
+    type: 'PROJECT_DELETE_ENV',
+    url: Api.ProjectEnvOper,
+    method: 'delete'
   }
 ]);
 
 export const { getAllProject, addProject, getProjectById,
-  delProject, projectAddEnv, projectUpdateEnv, getProjectUrl } = reduxRequests.actionCreators;
+  delProject, projectDeleteEnv,
+  projectAddEnv, projectUpdateEnv, getProjectUrl }
+  = reduxRequests.actionCreators;
 
 export default reduxRequests.handleActions;
 

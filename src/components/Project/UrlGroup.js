@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Table, message, Input, Button } from 'antd';
+import { Table, message, Input, Button, Popconfirm } from 'antd';
 import find from 'lodash/find';
 import findIndex from 'lodash/findIndex';
 import moment from 'moment';
@@ -31,6 +31,8 @@ class UrlGroup extends React.Component {
     update: PropTypes.func.isRequired,
     updateUrl: PropTypes.func.isRequired,
     add: PropTypes.func.isRequired,
+    getUrlGroupByProject: PropTypes.func.isRequired,
+    deleteUrlGroup: PropTypes.func.isRequired,
     getProjectUrl: PropTypes.func.isRequired,
     updateResult: PropTypes.shape({
       code: PropTypes.number.isRequired
@@ -44,6 +46,12 @@ class UrlGroup extends React.Component {
     getProjectUrlResult: PropTypes.shape({
       code: PropTypes.number.isRequired
     }),
+    getUrlGroupByProjectResult: PropTypes.shape({
+      code: PropTypes.number.isRequired
+    }),
+    deleteUrlGroupResult: PropTypes.shape({
+      code: PropTypes.number.isRequired
+    }),
   };
 
   static defaultProps = {
@@ -52,7 +60,9 @@ class UrlGroup extends React.Component {
     updateResult: undefined,
     updateUrlResult: undefined,
     addResult: undefined,
-    getProjectUrlResult: undefined
+    getProjectUrlResult: undefined,
+    getUrlGroupByProjectResult: undefined,
+    deleteUrlGroupResult: undefined,
   };
 
   constructor(props) {
@@ -67,12 +77,22 @@ class UrlGroup extends React.Component {
   componentWillReceiveProps(nextProps) {
     const { project, updateResult,
       updateUrlResult, getProjectUrlResult,
-      addResult } = nextProps;
-    console.log('componentWillReceiveProps');
-    // if (projectId !== this.props.projectId && projectId) {
-    //   this.getProjectUrl(projectId);
-    // }
-
+      addResult, deleteUrlGroupResult, getUrlGroupByProjectResult } = nextProps;
+    if (deleteUrlGroupResult !== this.props.deleteUrlGroupResult) {
+      if (deleteUrlGroupResult.code === 0) {
+        this.getProjectUrl(project.id);
+        this.setState({ urlGroups: deleteUrlGroupResult.data });
+      } else {
+        message.error(deleteUrlGroupResult.message);
+      }
+    }
+    if (getUrlGroupByProjectResult !== this.props.getUrlGroupByProjectResult) {
+      if (getUrlGroupByProjectResult.code === 0) {
+        this.setState({ urlGroups: getUrlGroupByProjectResult.data });
+      } else {
+        message.error(getUrlGroupByProjectResult.message);
+      }
+    }
     if (getProjectUrlResult !== this.props.getProjectUrlResult) {
       if (getProjectUrlResult.code === 0) {
         this.setState({ urls: getProjectUrlResult.data });
@@ -81,7 +101,8 @@ class UrlGroup extends React.Component {
       }
     }
     if (project && project !== this.props.project) {
-      this.setState({ urlGroups: project.urlGroups, envs: project.envs });
+      this.setState({ envs: project.envs });
+      this.props.getUrlGroupByProject({ project: project.id });
       this.getProjectUrl(project.id);
     }
     if (updateUrlResult !== this.props.updateUrlResult) {
@@ -102,8 +123,9 @@ class UrlGroup extends React.Component {
     }
     if (addResult !== this.props.addResult) {
       if (addResult.code === 0) {
-        this.state.urlGroups.push(addResult.data);
-        this.setState({ name: '' });
+        const urlGroups = [...this.state.urlGroups];
+        urlGroups.push(addResult.data);
+        this.setState({ name: '', urlGroups });
         this.getProjectUrl(project.id);
       } else {
         message.error(updateResult.message);
@@ -148,7 +170,10 @@ class UrlGroup extends React.Component {
       {
         title: '环境',
         dataIndex: 'env',
-        render: (value) => find(envs, { id: value }).name
+        render: (value) => {
+          const env = find(envs, { id: value });
+          if (env) return env.name;
+        }
       },
       {
         title: '链接',
@@ -165,7 +190,7 @@ class UrlGroup extends React.Component {
       <Table
         rowKey="id"
         columns={columns}
-        dataSource={filter(urls, { urlGroup: item.id })}
+        dataSource={filter(urls, { urlGroup: item.id }) || []}
         pagination={false}
       />
     );
@@ -177,10 +202,14 @@ class UrlGroup extends React.Component {
     const { name } = this.state;
     if (!name) return message.error('请填写链接组名称');
 
-    this.props.add({ id: this.props.project.id, name });
+    this.props.add({ project: this.props.project.id, name });
   }
+
+  handleDelClick = (urlGroup) => {
+    this.props.deleteUrlGroup(urlGroup);
+  }
+
   render() {
-    console.count('urlgroup render');
     const { urlGroups, name } = this.state;
 
     const urlGroupColumns = [
@@ -193,7 +222,19 @@ class UrlGroup extends React.Component {
             onChange={this.onUrlGroupCellChange(index, 'name')}
           />)
       },
-      ...timeColumns
+      ...timeColumns,
+      {
+        title: '操作',
+        dataIndex: 'id',
+        render: (text, item) => (<div>
+          <Popconfirm
+            title={`确认删除 ${item.name} 环境吗？`}
+            onConfirm={() => { this.handleDelClick(item); }}
+          >
+            <a href="javascript:'">删除</a>
+          </Popconfirm>
+        </div>)
+      }
     ];
     return (
       <div className="UrlGroup">
@@ -207,7 +248,7 @@ class UrlGroup extends React.Component {
           rowKey="id"
           pagination={false}
           columns={urlGroupColumns}
-          dataSource={urlGroups}
+          dataSource={urlGroups || []}
           expandedRowRender={this.expandedRowRender}
         />
       </div>

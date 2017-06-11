@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Tabs, Form, Input, Table, Button, message } from 'antd';
+import { Tabs, Form, Input, Table, Button, message, Popconfirm } from 'antd';
 import findIndex from 'lodash/findIndex';
 import moment from 'moment';
 import EditableCell from './EditableCell';
@@ -40,6 +40,7 @@ class Detail extends React.Component {
     getProjectById: PropTypes.func.isRequired,
     projectUpdateEnv: PropTypes.func.isRequired,
     projectAddEnv: PropTypes.func.isRequired,
+    projectDeleteEnv: PropTypes.func.isRequired,
     getProjectByIdResult: PropTypes.shape({
       code: PropTypes.number.isRequired
     }),
@@ -49,12 +50,16 @@ class Detail extends React.Component {
     projectAddEnvResult: PropTypes.shape({
       code: PropTypes.number.isRequired
     }),
+    projectDeleteEnvResult: PropTypes.shape({
+      code: PropTypes.number.isRequired
+    }),
   };
 
   static defaultProps = {
     getProjectByIdResult: undefined,
     projectUpdateEnvResult: undefined,
     projectAddEnvResult: undefined,
+    projectDeleteEnvResult: undefined,
   };
 
   constructor(props) {
@@ -67,15 +72,21 @@ class Detail extends React.Component {
   }
 
   componentDidMount() {
-    this.props.getProjectById({ id: this.props.params.id });
+    this.getProject();
   }
 
   componentWillReceiveProps(nextProps) {
     const {
       getProjectByIdResult, projectUpdateEnvResult,
-      projectAddEnvResult
+      projectAddEnvResult, projectDeleteEnvResult
     } = nextProps;
-
+    if (projectDeleteEnvResult !== this.props.projectDeleteEnvResult) {
+      if (projectDeleteEnvResult.code === 0) {
+        this.getProject();
+      } else {
+        message.error(projectDeleteEnvResult.message);
+      }
+    }
     if (getProjectByIdResult !== this.props.getProjectByIdResult) {
       if (getProjectByIdResult.code === 0) {
         this.setState({ project: getProjectByIdResult.data });
@@ -100,6 +111,11 @@ class Detail extends React.Component {
       }
     }
   }
+
+  getProject = () => {
+    this.props.getProjectById({ id: this.props.params.id });
+  }
+
   envChange = (env) => {
     const project = { ...this.state.project };
     const index = findIndex(project.envs, { id: env.id });
@@ -113,7 +129,7 @@ class Detail extends React.Component {
     const dataSource = [...project.envs];
 
     this.props.projectUpdateEnv({
-      projectId: project.id,
+      project: project.id,
       id: dataSource[index].id,
       [key]: value
     });
@@ -125,7 +141,10 @@ class Detail extends React.Component {
     const { envName, project } = this.state;
     if (!envName) return message.error('请填写环境名称');
 
-    this.props.projectAddEnv({ projectId: project.id, name: envName });
+    this.props.projectAddEnv({ project: project.id, name: envName });
+  }
+  handleDelClick = (env) => {
+    this.props.projectDeleteEnv(env);
   }
   render() {
     const { project, envName } = this.state;
@@ -145,7 +164,19 @@ class Detail extends React.Component {
             onChange={this.onEnvCellChange(index, 'name')}
           />)
       },
-      ...timeColumns
+      ...timeColumns,
+      {
+        title: '操作',
+        dataIndex: 'id',
+        render: (text, item) => (<div>
+          <Popconfirm
+            title={`确认删除 ${item.name} 环境吗？`}
+            onConfirm={() => { this.handleDelClick(item); }}
+          >
+            <a href="javascript:'">删除</a>
+          </Popconfirm>
+        </div>)
+      }
     ];
     return (
       <div className="detail">
