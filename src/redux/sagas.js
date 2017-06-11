@@ -1,5 +1,5 @@
 import { watchSignUpSaga, watchCheckUsernameExistSaga, watchSignInSaga } from './account';
-import { watchGetAllProjectSaga, watchAddProjectSaga, watchGetProjectByIdSaga, watchDelProjectSaga, watchProjectUpdateEnvSaga } from './project';
+import { watchSagas as projectSagas } from './project';
 import { watchSendEmailCodeSaga } from './email';
 import { watchSagas } from './urlGroup';
 
@@ -8,11 +8,7 @@ export default function* rootSaga() {
     watchSignUpSaga(),
     watchCheckUsernameExistSaga(),
     watchSignInSaga(),
-    watchGetAllProjectSaga(),
-    watchAddProjectSaga(),
-    watchGetProjectByIdSaga(),
-    watchDelProjectSaga(),
-    watchProjectUpdateEnvSaga(),
+    ...projectSagas,
     watchSendEmailCodeSaga(),
     ...watchSagas
   ];

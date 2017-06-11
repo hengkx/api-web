@@ -44,7 +44,6 @@ class Project extends React.Component {
     };
   }
 
-
   componentDidMount() {
     this.props.getAllProject();
   }
@@ -87,7 +86,7 @@ class Project extends React.Component {
     });
   }
   handleDelClick = (id) => {
-    this.props.delProject(id);
+    this.props.delProject({ id });
   }
 
   render() {

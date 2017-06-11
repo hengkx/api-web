@@ -1,10 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Tabs, Form, Input, Table, message } from 'antd';
+import { Tabs, Form, Input, Table, Button, message } from 'antd';
 import moment from 'moment';
 import EditableCell from './EditableCell';
 import UrlGroup from '../../containers/UrlGroup';
 import './less/detail.less';
+
+const InputGroup = Input.Group;
 
 const timeColumns = [
   {
@@ -52,12 +54,13 @@ class Detail extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      project: {}
+      project: {},
+      envName: ''
     };
   }
 
   componentDidMount() {
-    this.props.getProjectById(this.props.params.id);
+    this.props.getProjectById({ id: this.props.params.id });
   }
 
   componentWillReceiveProps(nextProps) {
@@ -65,7 +68,11 @@ class Detail extends React.Component {
       getProjectByIdResult, projectUpdateEnvResult
     } = nextProps;
     if (getProjectByIdResult !== this.props.getProjectByIdResult) {
-      this.setState({ project: getProjectByIdResult.data });
+      if (getProjectByIdResult.code === 0) {
+        this.setState({ project: getProjectByIdResult.data });
+      } else {
+        message.error(getProjectByIdResult.message);
+      }
     }
     if (projectUpdateEnvResult !== this.props.projectUpdateEnvResult) {
       if (projectUpdateEnvResult.code === 0) {
@@ -86,9 +93,15 @@ class Detail extends React.Component {
       [key]: value
     });
   })
-
+  handleEnvNameChange = (e) => {
+    this.setState({ envName: e.target.value });
+  }
+  handleAddEnvClick = () => {
+    const { envName } = this.state;
+    if (!envName) return message.error('请填写环境名称');
+  }
   render() {
-    const { project } = this.state;
+    const { project, envName } = this.state;
     const { getFieldDecorator } = this.props.form;
     const formItemLayout = {
       labelCol: { span: 4 },
@@ -107,6 +120,7 @@ class Detail extends React.Component {
       },
       ...timeColumns
     ];
+    console.log(project);
     return (
       <div className="detail">
         <Tabs defaultActiveKey="3">
@@ -135,6 +149,12 @@ class Detail extends React.Component {
             </Form>
             <div className="sub-title">
               项目环境
+            </div>
+            <div className="table-oper">
+              <InputGroup compact>
+                <Input placeholder="环境名称" value={envName} onChange={this.handleEnvNameChange} style={{ width: '2rem' }} />
+                <Button type="primary" onClick={this.handleAddEnvClick}>添加</Button>
+              </InputGroup>
             </div>
             <Table
               rowKey="id"
