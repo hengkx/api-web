@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Tabs, Form, Input, Table, Button, message } from 'antd';
+import findIndex from 'lodash/findIndex';
 import moment from 'moment';
 import EditableCell from './EditableCell';
 import UrlGroup from '../../containers/UrlGroup';
@@ -38,10 +39,14 @@ class Detail extends React.Component {
     }).isRequired,
     getProjectById: PropTypes.func.isRequired,
     projectUpdateEnv: PropTypes.func.isRequired,
+    projectAddEnv: PropTypes.func.isRequired,
     getProjectByIdResult: PropTypes.shape({
       code: PropTypes.number.isRequired
     }),
     projectUpdateEnvResult: PropTypes.shape({
+      code: PropTypes.number.isRequired
+    }),
+    projectAddEnvResult: PropTypes.shape({
       code: PropTypes.number.isRequired
     }),
   };
@@ -49,13 +54,15 @@ class Detail extends React.Component {
   static defaultProps = {
     getProjectByIdResult: undefined,
     projectUpdateEnvResult: undefined,
+    projectAddEnvResult: undefined,
   };
 
   constructor(props) {
     super(props);
     this.state = {
       project: {},
-      envName: ''
+      envName: '',
+      urls: []
     };
   }
 
@@ -65,8 +72,10 @@ class Detail extends React.Component {
 
   componentWillReceiveProps(nextProps) {
     const {
-      getProjectByIdResult, projectUpdateEnvResult
+      getProjectByIdResult, projectUpdateEnvResult,
+      projectAddEnvResult
     } = nextProps;
+
     if (getProjectByIdResult !== this.props.getProjectByIdResult) {
       if (getProjectByIdResult.code === 0) {
         this.setState({ project: getProjectByIdResult.data });
@@ -76,13 +85,29 @@ class Detail extends React.Component {
     }
     if (projectUpdateEnvResult !== this.props.projectUpdateEnvResult) {
       if (projectUpdateEnvResult.code === 0) {
-        this.setState({ project: projectUpdateEnvResult.data });
+        this.envChange(projectUpdateEnvResult.data);
       } else {
         message.error(projectUpdateEnvResult.message);
       }
     }
+    if (projectAddEnvResult !== this.props.projectAddEnvResult) {
+      if (projectAddEnvResult.code === 0) {
+        const project = { ...this.state.project };
+        project.envs.push(projectAddEnvResult.data);
+        this.setState({ project, envName: '' });
+      } else {
+        message.error(projectAddEnvResult.message);
+      }
+    }
   }
-
+  envChange = (env) => {
+    const project = { ...this.state.project };
+    const index = findIndex(project.envs, { id: env.id });
+    if (index !== -1) {
+      project.envs[index] = env;
+      this.setState({ project });
+    }
+  }
   onEnvCellChange = (index, key) => ((value) => {
     const { project } = this.state;
     const dataSource = [...project.envs];
@@ -97,8 +122,10 @@ class Detail extends React.Component {
     this.setState({ envName: e.target.value });
   }
   handleAddEnvClick = () => {
-    const { envName } = this.state;
+    const { envName, project } = this.state;
     if (!envName) return message.error('请填写环境名称');
+
+    this.props.projectAddEnv({ projectId: project.id, name: envName });
   }
   render() {
     const { project, envName } = this.state;
@@ -120,7 +147,6 @@ class Detail extends React.Component {
       },
       ...timeColumns
     ];
-    console.log(project);
     return (
       <div className="detail">
         <Tabs defaultActiveKey="3">
@@ -165,7 +191,7 @@ class Detail extends React.Component {
             <div className="sub-title">
               基本链接
             </div>
-            <UrlGroup envs={project.envs} urlGroups={project.urlGroups} />
+            <UrlGroup project={project} />
           </TabPane>
         </Tabs>
       </div>

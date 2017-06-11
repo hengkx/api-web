@@ -1,11 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Table, message } from 'antd';
+import { Table, message, Input, Button } from 'antd';
 import find from 'lodash/find';
 import findIndex from 'lodash/findIndex';
 import moment from 'moment';
+import filter from 'lodash/filter';
 import EditableCell from './EditableCell';
 import './less/detail.less';
+
+const InputGroup = Input.Group;
 
 const timeColumns = [
   {
@@ -22,48 +25,70 @@ const timeColumns = [
 
 class UrlGroup extends React.Component {
   static propTypes = {
+    project: PropTypes.shape({
+      id: PropTypes.string
+    }),
     update: PropTypes.func.isRequired,
     updateUrl: PropTypes.func.isRequired,
+    add: PropTypes.func.isRequired,
+    getProjectUrl: PropTypes.func.isRequired,
     updateResult: PropTypes.shape({
       code: PropTypes.number.isRequired
     }),
     updateUrlResult: PropTypes.shape({
       code: PropTypes.number.isRequired
     }),
-    urlGroups: PropTypes.arrayOf(PropTypes.shape({
-      id: PropTypes.string.isRequired
-    })),
-    envs: PropTypes.arrayOf(PropTypes.shape({
-      id: PropTypes.string.isRequired
-    }))
+    addResult: PropTypes.shape({
+      code: PropTypes.number.isRequired
+    }),
+    getProjectUrlResult: PropTypes.shape({
+      code: PropTypes.number.isRequired
+    }),
   };
 
   static defaultProps = {
-    urlGroups: [],
-    envs: [],
+    urls: [],
+    project: undefined,
     updateResult: undefined,
     updateUrlResult: undefined,
+    addResult: undefined,
+    getProjectUrlResult: undefined
   };
 
   constructor(props) {
     super(props);
     this.state = {
-      envs: props.envs,
-      urlGroups: props.urlGroups
+      envs: [],
+      urlGroups: [],
+      name: ''
     };
   }
 
   componentWillReceiveProps(nextProps) {
-    const { urlGroups, envs, updateResult, updateUrlResult } = nextProps;
-    if (urlGroups !== this.props.urlGroups) {
-      this.setState({ urlGroups });
+    const { project, updateResult,
+      updateUrlResult, getProjectUrlResult,
+      addResult } = nextProps;
+    console.log('componentWillReceiveProps');
+    // if (projectId !== this.props.projectId && projectId) {
+    //   this.getProjectUrl(projectId);
+    // }
+
+    if (getProjectUrlResult !== this.props.getProjectUrlResult) {
+      if (getProjectUrlResult.code === 0) {
+        this.setState({ urls: getProjectUrlResult.data });
+      } else {
+        message.error(getProjectUrlResult.message);
+      }
     }
-    if (envs !== this.props.envs) {
-      this.setState({ envs });
+    if (project && project !== this.props.project) {
+      this.setState({ urlGroups: project.urlGroups, envs: project.envs });
+      this.getProjectUrl(project.id);
     }
     if (updateUrlResult !== this.props.updateUrlResult) {
       if (updateUrlResult.code === 0) {
-        this.urlGroupChange(updateUrlResult.data);
+        const { urls } = this.state;
+        const index = findIndex(urls, { id: updateUrlResult.data.id });
+        urls[index] = updateUrlResult.data;
       } else {
         message.error(updateUrlResult.message);
       }
@@ -75,8 +100,20 @@ class UrlGroup extends React.Component {
         message.error(updateResult.message);
       }
     }
+    if (addResult !== this.props.addResult) {
+      if (addResult.code === 0) {
+        this.state.urlGroups.push(addResult.data);
+        this.setState({ name: '' });
+        this.getProjectUrl(project.id);
+      } else {
+        message.error(updateResult.message);
+      }
+    }
   }
 
+  getProjectUrl = (projectId) => {
+    this.props.getProjectUrl({ id: projectId });
+  }
   urlGroupChange = (urlGroup) => {
     const { urlGroups } = this.state;
     const index = findIndex(urlGroups, { id: urlGroup.id });
@@ -85,13 +122,13 @@ class UrlGroup extends React.Component {
     }
   }
 
-  onUrlCellChange = (urlGroupIndex, urlIndex, key) => ((value) => {
-    const { urlGroups } = this.state;
-    const dataSource = [...urlGroups[urlGroupIndex].urls];
+  onUrlCellChange = (urlId, urlIndex, key) => ((value) => {
+    const { urls } = this.state;
+    const url = find(urls, { id: urlId });
     this.props.updateUrl({
-      ...dataSource[urlIndex],
+      ...url,
       [key]: value,
-      urlGroupId: urlGroups[urlGroupIndex].id
+      urlGroupId: url.urlGroup
     });
   })
 
@@ -105,12 +142,12 @@ class UrlGroup extends React.Component {
     });
   })
 
-  expandedRowRender = (item, urlGroupIndex) => {
-    const { envs } = this.state;
+  expandedRowRender = (item) => {
+    const { envs, urls } = this.state;
     const columns = [
       {
         title: '环境',
-        dataIndex: 'env_id',
+        dataIndex: 'env',
         render: (value) => find(envs, { id: value }).name
       },
       {
@@ -119,24 +156,32 @@ class UrlGroup extends React.Component {
         render: (text, record, urlIndex) => (
           <EditableCell
             value={text}
-            onChange={this.onUrlCellChange(urlGroupIndex, urlIndex, 'url')}
+            onChange={this.onUrlCellChange(record.id, urlIndex, 'url')}
           />)
       },
       ...timeColumns
     ];
-
     return (
       <Table
         rowKey="id"
         columns={columns}
-        dataSource={item.urls}
+        dataSource={filter(urls, { urlGroup: item.id })}
         pagination={false}
       />
     );
   };
+  handleNameChange = (e) => {
+    this.setState({ name: e.target.value });
+  }
+  handleAddUrlGroupClick = () => {
+    const { name } = this.state;
+    if (!name) return message.error('请填写链接组名称');
 
+    this.props.add({ id: this.props.project.id, name });
+  }
   render() {
-    const { urlGroups } = this.state;
+    console.count('urlgroup render');
+    const { urlGroups, name } = this.state;
 
     const urlGroupColumns = [
       {
@@ -152,6 +197,12 @@ class UrlGroup extends React.Component {
     ];
     return (
       <div className="UrlGroup">
+        <div className="table-oper">
+          <InputGroup compact>
+            <Input placeholder="链接组名称" value={name} onChange={this.handleNameChange} style={{ width: '2rem' }} />
+            <Button type="primary" onClick={this.handleAddUrlGroupClick}>添加</Button>
+          </InputGroup>
+        </div>
         <Table
           rowKey="id"
           pagination={false}
