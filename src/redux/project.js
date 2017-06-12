@@ -1,57 +1,28 @@
 import ReduxReqs from 'redux-reqs';
 import Api from '../config/api';
 
-const reduxRequests = ReduxReqs([
-  {
-    type: 'GET_ALL_PROJECT',
-    url: Api.Project,
-    method: 'get'
-  },
-  {
-    type: 'ADD_PROJECT',
-    url: Api.Project,
-    method: 'post'
-  },
-  {
-    type: 'GET_PROJECT_BY_ID',
-    url: Api.ProjectOper,
-    method: 'get'
-  },
-  {
-    type: 'GET_PROJECT_Url',
-    url: Api.ProjectUrl,
-    method: 'get'
-  },
-  {
-    type: 'DEL_PROJECT',
-    url: Api.ProjectOper,
-    method: 'delete'
-  },
-  {
-    type: 'PROJECT_ADD_ENV',
-    url: Api.ProjectEnvOper,
-    method: 'post'
-  },
-  {
-    type: 'PROJECT_UPDATE_ENV',
-    url: Api.ProjectEnvOper,
-    method: 'put'
-  },
-  {
-    type: 'PROJECT_DELETE_ENV',
-    url: Api.ProjectEnvOper,
-    method: 'delete'
-  }
-]);
+const reduxReqs = new ReduxReqs({
+  prefix: 'PROJECT'
+});
+
+reduxReqs
+  .get('GET_ALL_PROJECT', Api.Project)
+  .get('GET_PROJECT_BY_ID', Api.ProjectOper)
+  .get('GET_PROJECT_Url', Api.ProjectUrl)
+  .post('ADD_PROJECT', Api.Project)
+  .post('PROJECT_ADD_ENV', Api.ProjectEnvOper)
+  .put('PROJECT_UPDATE_ENV', Api.ProjectEnvOper)
+  .del('DEL_PROJECT', Api.ProjectOper)
+  .del('PROJECT_DELETE_ENV', Api.ProjectEnvOper);
 
 export const { getAllProject, addProject, getProjectById,
   delProject, projectDeleteEnv,
   projectAddEnv, projectUpdateEnv, getProjectUrl }
-  = reduxRequests.actionCreators;
+  = reduxReqs.getCreateActions();
 
-export default reduxRequests.handleActions;
+export default reduxReqs.getReducers();
 
-export const watchSagas = reduxRequests.watchSagas;
+export const watchSagas = reduxReqs.getWatchSagas();
 
 
 // function* getAllProjectSaga(data) {

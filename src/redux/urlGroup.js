@@ -1,37 +1,22 @@
 import ReduxReqs from 'redux-reqs';
+// import ReduxReqs from 'C:/Users/happy/Desktop/redux-reqs/lib';
 import Api from '../config/api';
 
-const reduxRequests = ReduxReqs([
-  {
-    type: 'getUrlGroupByProject',
-    url: Api.ProjectUrlGroup,
-    method: 'get'
-  },
-  {
-    type: 'Add',
-    url: Api.ProjectUrlGroup,
-    method: 'post'
-  },
-  {
-    type: 'UPDATE',
-    url: Api.UrlGroupOper,
-    method: 'put'
-  },
-  {
-    type: 'DELETE_URL_GROUP',
-    url: Api.ProjectUrlGroup,
-    method: 'delete'
-  },
-  {
-    type: 'UPDATE_URL',
-    url: Api.EditUrl,
-    method: 'put'
-  }
-]);
+const reduxReqs = new ReduxReqs({
+  prefix: 'URL_GRPOUP'
+});
 
-export const { update, updateUrl, add, deleteUrlGroup, getUrlGroupByProject } = reduxRequests.actionCreators;
+reduxReqs
+  .get('GET_URL_GROUP_BY_PROJECT', Api.ProjectUrlGroup)
+  .post('Add', Api.ProjectUrlGroup)
+  .put('UPDATE', Api.UrlGroupOper)
+  .del('DELETE_URL_GROUP', Api.ProjectUrlGroup)
+  .put('UPDATE_URL', Api.EditUrl);
 
-export default reduxRequests.handleActions;
+export const { update, updateUrl, add, deleteUrlGroup,
+  getUrlGroupByProject } = reduxReqs.getCreateActions();
 
-export const watchSagas = reduxRequests.watchSagas;
+export default reduxReqs.getReducers();
+
+export const watchSagas = reduxReqs.getWatchSagas();
 
