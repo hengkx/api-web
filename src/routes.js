@@ -28,6 +28,14 @@ export default [
     ]
   },
   {
+    path: 'test',
+    getComponent: (nextState, cb) => {
+      require.ensure([], (require) => {
+        cb(null, withRouter(require('./components/Test')));
+      }, 'test');
+    }
+  },
+  {
     path: 'signin',
     getComponent: (nextState, cb) => {
       require.ensure([], (require) => {
