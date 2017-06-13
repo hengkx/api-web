@@ -22,10 +22,11 @@ class Param extends React.Component {
     const { items } = this.state;
     return (
       <div className="param">
-        {items.map((item, index) =>
-          <Item key={index} />
-        )}
-
+        <ul>
+          {items.map((item, index) =>
+            <li key={index} ><Item /></li>
+          )}
+        </ul>
         <Button type="primary" onClick={this.handleAddClick}>添加</Button>
       </div>
     );

@@ -17,7 +17,7 @@ class Value extends React.Component {
       getFieldsValue: PropTypes.func.isRequired,
     }).isRequired,
     default: PropTypes.bool,
-    value: PropTypes.shape({ id: PropTypes.string.isRequired }).isRequired,
+    value: PropTypes.shape({ uuid: PropTypes.string.isRequired }).isRequired,
     del: PropTypes.func.isRequired
   }
 
@@ -76,6 +76,6 @@ class Value extends React.Component {
 
 export default Form.create({
   onFieldsChange(props, changedFields) {
-    props.onChange(changedFields, props.value.id);
+    props.onChange(changedFields, props.value.uuid);
   }
 })(Value);
