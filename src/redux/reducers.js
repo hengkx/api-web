@@ -5,6 +5,7 @@ import account from './account';
 import project from './project';
 import email from './email';
 import urlGroup from './urlGroup';
+import env from './env';
 
 export default combineReducers({
   routing: routerReducer,
@@ -12,5 +13,6 @@ export default combineReducers({
   account,
   project,
   email,
-  urlGroup
+  urlGroup,
+  env
 });

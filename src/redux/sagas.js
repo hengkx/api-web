@@ -2,6 +2,8 @@ import { watchSignUpSaga, watchCheckUsernameExistSaga, watchSignInSaga } from '.
 import { watchSagas as projectSagas } from './project';
 import { watchSendEmailCodeSaga } from './email';
 import { watchSagas } from './urlGroup';
+import { watchSagas as envSagas } from './env';
+
 
 export default function* rootSaga() {
   yield [
@@ -10,6 +12,7 @@ export default function* rootSaga() {
     watchSignInSaga(),
     ...projectSagas,
     watchSendEmailCodeSaga(),
-    ...watchSagas
+    ...watchSagas,
+    ...envSagas
   ];
 }

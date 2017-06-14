@@ -23,7 +23,17 @@ export default [
           require.ensure([], (require) => {
             cb(null, withRouter(require('./containers/ProjectDetail')));
           }, 'projectDetail');
-        }
+        },
+        childRoutes: [
+          {
+            path: 'env',
+            getComponent: (nextState, cb) => {
+              require.ensure([], (require) => {
+                cb(null, withRouter(require('./containers/Env')));
+              }, 'env');
+            }
+          }
+        ]
       }
     ]
   },

@@ -1,26 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Tabs, Form, Input, Table, Button, message, Popconfirm } from 'antd';
+import { Menu, Tabs, Form, Input, Table, Button, message, Popconfirm } from 'antd';
 import findIndex from 'lodash/findIndex';
-import moment from 'moment';
-import EditableCell from './EditableCell';
+
 import UrlGroup from '../../containers/UrlGroup';
 import './less/detail.less';
 
 const InputGroup = Input.Group;
 
-const timeColumns = [
-  {
-    title: '创建时间',
-    dataIndex: 'create_date',
-    render: (text) => moment(text).format('YYYY-MM-DD HH:mm:ss')
-  },
-  {
-    title: '最后修改时间',
-    dataIndex: 'update_date',
-    render: (text) => moment(text).format('YYYY-MM-DD HH:mm:ss')
-  }
-];
+
 
 const TabPane = Tabs.TabPane;
 const FormItem = Form.Item;
@@ -124,28 +112,14 @@ class Detail extends React.Component {
       this.setState({ project });
     }
   }
-  onEnvCellChange = (index, key) => ((value) => {
-    const { project } = this.state;
-    const dataSource = [...project.envs];
 
-    this.props.projectUpdateEnv({
-      project: project.id,
-      id: dataSource[index].id,
-      [key]: value
-    });
-  })
-  handleEnvNameChange = (e) => {
-    this.setState({ envName: e.target.value });
-  }
   handleAddEnvClick = () => {
     const { envName, project } = this.state;
     if (!envName) return message.error('请填写环境名称');
 
     this.props.projectAddEnv({ project: project.id, name: envName });
   }
-  handleDelClick = (env) => {
-    this.props.projectDeleteEnv(env);
-  }
+
   render() {
     const { project, envName } = this.state;
     const { getFieldDecorator } = this.props.form;
@@ -154,77 +128,51 @@ class Detail extends React.Component {
       wrapperCol: { span: 18 },
     };
 
-    const envColumns = [
-      {
-        title: '名称',
-        dataIndex: 'name',
-        render: (text, record, index) => (
-          <EditableCell
-            value={text}
-            onChange={this.onEnvCellChange(index, 'name')}
-          />)
-      },
-      ...timeColumns,
-      {
-        title: '操作',
-        dataIndex: 'id',
-        render: (text, item) => (<div>
-          <Popconfirm
-            title={`确认删除 ${item.name} 环境吗？`}
-            onConfirm={() => { this.handleDelClick(item); }}
-          >
-            <a href="javascript:'">删除</a>
-          </Popconfirm>
-        </div>)
-      }
-    ];
+
     return (
       <div className="detail">
-        <Tabs defaultActiveKey="3">
-          <TabPane tab="接口文档" key="1">Content of Tab 1</TabPane>
-          <TabPane tab="Tab 2" key="2">Content of Tab 2</TabPane>
-          <TabPane tab="项目设置" key="3">
-            <Form>
-              <FormItem
-                label="项目名称"
-                {...formItemLayout}
-              >
-                {getFieldDecorator('name', {
-                  initialValue: project.name,
-                  rules: [{ required: true, message: '请输入项目名称!' }],
-                })(<Input />)}
-              </FormItem>
-              <FormItem
-                label="版本号"
-                {...formItemLayout}
-              >
-                {getFieldDecorator('version', {
-                  initialValue: project.version,
-                  rules: [{ required: true, message: '请输入项目版本号!' }],
-                })(<Input />)}
-              </FormItem>
-            </Form>
-            <div className="sub-title">
-              项目环境
+        <div className="side-menu">
+          <Menu>
+            <Menu.Item>aa</Menu.Item>
+            <Menu.Item>aa</Menu.Item>
+            <Menu.Item>aa</Menu.Item>
+            <Menu.Item>项目环境</Menu.Item>
+            <Menu.Item>基本链接</Menu.Item>
+          </Menu>
+        </div>
+        <div className="content">
+          {this.props.children}
+          <Tabs defaultActiveKey="3">
+            <TabPane tab="接口文档" key="1">Content of Tab 1</TabPane>
+            <TabPane tab="Tab 2" key="2">Content of Tab 2</TabPane>
+            <TabPane tab="项目设置" key="3">
+              <Form>
+                <FormItem
+                  label="项目名称"
+                  {...formItemLayout}
+                >
+                  {getFieldDecorator('name', {
+                    initialValue: project.name,
+                    rules: [{ required: true, message: '请输入项目名称!' }],
+                  })(<Input />)}
+                </FormItem>
+                <FormItem
+                  label="版本号"
+                  {...formItemLayout}
+                >
+                  {getFieldDecorator('version', {
+                    initialValue: project.version,
+                    rules: [{ required: true, message: '请输入项目版本号!' }],
+                  })(<Input />)}
+                </FormItem>
+              </Form>
+              <div className="sub-title">
+                基本链接
             </div>
-            <div className="table-oper">
-              <InputGroup compact>
-                <Input placeholder="环境名称" value={envName} onChange={this.handleEnvNameChange} style={{ width: '2rem' }} />
-                <Button type="primary" onClick={this.handleAddEnvClick}>添加</Button>
-              </InputGroup>
-            </div>
-            <Table
-              rowKey="id"
-              pagination={false}
-              columns={envColumns}
-              dataSource={project.envs}
-            />
-            <div className="sub-title">
-              基本链接
-            </div>
-            <UrlGroup project={project} />
-          </TabPane>
-        </Tabs>
+              <UrlGroup project={project} />
+            </TabPane>
+          </Tabs>
+        </div>
       </div>
     );
   }
