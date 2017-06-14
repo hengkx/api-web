@@ -3,10 +3,15 @@ import Param from '../Param';
 // import Tree from '../Tree';
 
 class Test extends React.Component {
+
+  handleParamSave = (params) => {
+    console.log(params);
+    console.log(JSON.stringify(params));
+  }
   render() {
     return (
       <div>
-        <Param />
+        <Param save={this.handleParamSave} />
       </div>
     );
   }

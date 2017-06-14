@@ -1,9 +1,18 @@
 .item {
-    display: flex;
-    .left {
-        flex: 1;
+    .parent {
+        display: flex;
+        .left {
+            flex: 1;
+        }
+        .right {
+            width: 1rem;
+        }
     }
-    .right {
-        width: 1rem;
+    .anticon {
+        font-size: .18rem;
+        &:hover {
+            color: #f00;
+            cursor: pointer;
+        }
     }
 }

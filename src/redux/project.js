@@ -2,7 +2,8 @@ import ReduxReqs from 'redux-reqs';
 import Api from '../config/api';
 
 const reduxReqs = new ReduxReqs({
-  prefix: 'PROJECT'
+  prefix: 'PROJECT',
+  prefixUrl: '/project'
 });
 
 reduxReqs

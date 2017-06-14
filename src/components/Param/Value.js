@@ -32,6 +32,10 @@ class Value extends React.Component {
     };
   }
 
+  componentDidMount() {
+    this.props.form.validateFields();
+  }
+
   componentWillReceiveProps(nextProps) {
     if (nextProps.default !== this.props.default) {
       this.props.form.setFieldsValue({ default: nextProps.default });
