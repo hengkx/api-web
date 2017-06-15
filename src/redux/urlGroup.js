@@ -3,18 +3,19 @@ import ReduxReqs from 'redux-reqs';
 import Api from '../config/api';
 
 const reduxReqs = new ReduxReqs({
-  prefix: 'URL_GRPOUP'
+  prefix: 'URL_GRPOUP',
+  defaultUrl: Api.ProjectUrlGroup
 });
 
 reduxReqs
-  .get('GET_URL_GROUP_BY_PROJECT', Api.ProjectUrlGroup)
-  .post('Add', Api.ProjectUrlGroup)
+  .get('GET_LIST_BY_PROJECT_ID')
+  .post('Add')
   .put('UPDATE', Api.UrlGroupOper)
-  .del('DELETE_URL_GROUP', Api.ProjectUrlGroup)
+  .del('DEL')
   .put('UPDATE_URL', Api.EditUrl);
 
-export const { update, updateUrl, add, deleteUrlGroup,
-  getUrlGroupByProject } = reduxReqs.getCreateActions();
+export const { update, updateUrl, add, del,
+  getListByProjectId } = reduxReqs.getCreateActions();
 
 export default reduxReqs.getReducers();
 

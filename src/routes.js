@@ -32,6 +32,30 @@ export default [
                 cb(null, withRouter(require('./containers/Env')));
               }, 'env');
             }
+          },
+          {
+            path: 'urlgroup',
+            getComponent: (nextState, cb) => {
+              require.ensure([], (require) => {
+                cb(null, withRouter(require('./containers/UrlGroup')));
+              }, 'urlgroup');
+            }
+          },
+          {
+            path: 'api',
+            getComponent: (nextState, cb) => {
+              require.ensure([], (require) => {
+                cb(null, withRouter(require('./containers/Api')));
+              }, 'api');
+            }
+          },
+          {
+            path: 'apiadd',
+            getComponent: (nextState, cb) => {
+              require.ensure([], (require) => {
+                cb(null, withRouter(require('./containers/ApiAdd')));
+              }, 'apiAdd');
+            }
           }
         ]
       }

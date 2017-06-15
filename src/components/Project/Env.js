@@ -74,6 +74,7 @@ class Env extends React.Component {
     if (addResult !== this.props.addResult) {
       if (addResult.code === 0) {
         message.success('添加环境成功！');
+        this.setState({ envName: '' });
         this.getEnvs();
       } else {
         message.error(addResult.message);

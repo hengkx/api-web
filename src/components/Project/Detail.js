@@ -2,13 +2,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Menu, Tabs, Form, Input, Table, Button, message, Popconfirm } from 'antd';
 import findIndex from 'lodash/findIndex';
-
-import UrlGroup from '../../containers/UrlGroup';
 import './less/detail.less';
 
 const InputGroup = Input.Group;
-
-
 
 const TabPane = Tabs.TabPane;
 const FormItem = Form.Item;
@@ -111,13 +107,6 @@ class Detail extends React.Component {
       project.envs[index] = env;
       this.setState({ project });
     }
-  }
-
-  handleAddEnvClick = () => {
-    const { envName, project } = this.state;
-    if (!envName) return message.error('请填写环境名称');
-
-    this.props.projectAddEnv({ project: project.id, name: envName });
   }
 
   render() {

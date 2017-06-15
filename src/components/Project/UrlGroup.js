@@ -25,14 +25,14 @@ const timeColumns = [
 
 class UrlGroup extends React.Component {
   static propTypes = {
-    project: PropTypes.shape({
-      id: PropTypes.string
-    }),
+    params: PropTypes.shape({
+      id: PropTypes.string.isRequired
+    }).isRequired,
     update: PropTypes.func.isRequired,
     updateUrl: PropTypes.func.isRequired,
     add: PropTypes.func.isRequired,
-    getUrlGroupByProject: PropTypes.func.isRequired,
-    deleteUrlGroup: PropTypes.func.isRequired,
+    getListByProjectId: PropTypes.func.isRequired,
+    del: PropTypes.func.isRequired,
     getProjectUrl: PropTypes.func.isRequired,
     updateResult: PropTypes.shape({
       code: PropTypes.number.isRequired
@@ -46,10 +46,10 @@ class UrlGroup extends React.Component {
     getProjectUrlResult: PropTypes.shape({
       code: PropTypes.number.isRequired
     }),
-    getUrlGroupByProjectResult: PropTypes.shape({
+    getListByProjectIdResult: PropTypes.shape({
       code: PropTypes.number.isRequired
     }),
-    deleteUrlGroupResult: PropTypes.shape({
+    delResult: PropTypes.shape({
       code: PropTypes.number.isRequired
     }),
   };
@@ -61,8 +61,8 @@ class UrlGroup extends React.Component {
     updateUrlResult: undefined,
     addResult: undefined,
     getProjectUrlResult: undefined,
-    getUrlGroupByProjectResult: undefined,
-    deleteUrlGroupResult: undefined,
+    getListByProjectIdResult: undefined,
+    delResult: undefined,
   };
 
   constructor(props) {
@@ -70,27 +70,41 @@ class UrlGroup extends React.Component {
     this.state = {
       envs: [],
       urlGroups: [],
-      name: ''
+      name: '',
+      projectId: props.params.id
     };
+  }
+  componentDidMount() {
+    this.getData();
+    this.props.getEnvs({ project: this.state.projectId });
   }
 
   componentWillReceiveProps(nextProps) {
-    const { project, updateResult,
+    const { updateResult, getEnvsResult,
       updateUrlResult, getProjectUrlResult,
-      addResult, deleteUrlGroupResult, getUrlGroupByProjectResult } = nextProps;
-    if (deleteUrlGroupResult !== this.props.deleteUrlGroupResult) {
-      if (deleteUrlGroupResult.code === 0) {
-        this.getProjectUrl(project.id);
-        this.setState({ urlGroups: deleteUrlGroupResult.data });
+      addResult, delResult, getListByProjectIdResult } = nextProps;
+
+    if (getEnvsResult !== this.props.getEnvsResult) {
+      if (getEnvsResult.code === 0) {
+        this.setState({ envs: getEnvsResult.data });
       } else {
-        message.error(deleteUrlGroupResult.message);
+        message.error(getEnvsResult.message);
       }
     }
-    if (getUrlGroupByProjectResult !== this.props.getUrlGroupByProjectResult) {
-      if (getUrlGroupByProjectResult.code === 0) {
-        this.setState({ urlGroups: getUrlGroupByProjectResult.data });
+
+    if (delResult !== this.props.delResult) {
+      if (delResult.code === 0) {
+        this.setState({ urlGroups: delResult.data });
+        message.success('删除链接组成功！');
       } else {
-        message.error(getUrlGroupByProjectResult.message);
+        message.error(delResult.message);
+      }
+    }
+    if (getListByProjectIdResult !== this.props.getListByProjectIdResult) {
+      if (getListByProjectIdResult.code === 0) {
+        this.setState({ urlGroups: getListByProjectIdResult.data });
+      } else {
+        message.error(getListByProjectIdResult.message);
       }
     }
     if (getProjectUrlResult !== this.props.getProjectUrlResult) {
@@ -100,16 +114,12 @@ class UrlGroup extends React.Component {
         message.error(getProjectUrlResult.message);
       }
     }
-    if (project && project !== this.props.project) {
-      this.setState({ envs: project.envs });
-      this.props.getUrlGroupByProject({ project: project.id });
-      this.getProjectUrl(project.id);
-    }
     if (updateUrlResult !== this.props.updateUrlResult) {
       if (updateUrlResult.code === 0) {
         const { urls } = this.state;
         const index = findIndex(urls, { id: updateUrlResult.data.id });
         urls[index] = updateUrlResult.data;
+        message.success('更新链接成功！');
       } else {
         message.error(updateUrlResult.message);
       }
@@ -117,6 +127,7 @@ class UrlGroup extends React.Component {
     if (updateResult !== this.props.updateResult) {
       if (updateResult.code === 0) {
         this.urlGroupChange(updateResult.data);
+        message.success('修改链接组成功！');
       } else {
         message.error(updateResult.message);
       }
@@ -126,14 +137,17 @@ class UrlGroup extends React.Component {
         const urlGroups = [...this.state.urlGroups];
         urlGroups.push(addResult.data);
         this.setState({ name: '', urlGroups });
-        this.getProjectUrl(project.id);
+        message.success('添加链接组成功！');
+        this.getData();
       } else {
         message.error(updateResult.message);
       }
     }
   }
 
-  getProjectUrl = (projectId) => {
+  getData = () => {
+    const { projectId } = this.state;
+    this.props.getListByProjectId({ project: projectId });
     this.props.getProjectUrl({ id: projectId });
   }
   urlGroupChange = (urlGroup) => {
@@ -199,14 +213,14 @@ class UrlGroup extends React.Component {
     this.setState({ name: e.target.value });
   }
   handleAddUrlGroupClick = () => {
-    const { name } = this.state;
+    const { name, projectId } = this.state;
     if (!name) return message.error('请填写链接组名称');
 
-    this.props.add({ project: this.props.project.id, name });
+    this.props.add({ project: projectId, name });
   }
 
   handleDelClick = (urlGroup) => {
-    this.props.deleteUrlGroup(urlGroup);
+    this.props.del(urlGroup);
   }
 
   render() {
