@@ -1,4 +1,5 @@
 import ReduxReqs from 'redux-reqs';
+// import ReduxReqs from 'D:/GitHub/redux-reqs/lib';
 import Api from '../config/api';
 
 const reduxReqs = new ReduxReqs({

@@ -142,7 +142,7 @@ class Detail extends React.Component {
         </div>
         <div className="content">
           {this.props.children}
-          <Tabs defaultActiveKey="3">
+          {/*<Tabs defaultActiveKey="3">
             <TabPane tab="接口文档" key="1">Content of Tab 1</TabPane>
             <TabPane tab="Tab 2" key="2">Content of Tab 2</TabPane>
             <TabPane tab="项目设置" key="3">
@@ -171,7 +171,7 @@ class Detail extends React.Component {
             </div>
               <UrlGroup project={project} />
             </TabPane>
-          </Tabs>
+          </Tabs>*/}
         </div>
       </div>
     );

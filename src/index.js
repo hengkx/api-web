@@ -1,3 +1,4 @@
+// import ReduxReqs from 'D:/GitHub/redux-reqs/lib';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { AppContainer } from 'react-hot-loader';
@@ -7,6 +8,8 @@ import isObject from 'lodash/isObject';
 import { message } from 'antd';
 // import pathToRegexp from 'path-to-regexp';
 import App from './App';
+
+// const axios = ReduxReqs.axios;
 
 if (process.env.NODE_ENV === 'development') {
   axios.defaults.baseURL = 'http://localhost:3000/';

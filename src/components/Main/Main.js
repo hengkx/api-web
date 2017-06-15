@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router';
 import { Layout, Menu } from 'antd';
+import { NProgress } from 'redux-nprogress';
 import './less/main.less';
 
 const { Header, Content } = Layout;
@@ -15,6 +16,7 @@ class Index extends React.Component {
   render() {
     return (
       <Layout>
+        <NProgress color="rgba(240, 173, 79, 1)" />
         <Header style={{ position: 'fixed', width: '100%' }}>
           <div className="logo"><Link to="/">API Doc</Link></div>
           <Menu
