@@ -15,7 +15,7 @@ class Index extends React.Component {
 
   render() {
     return (
-      <Layout>
+      <Layout style={{ height: '100%' }}>
         <NProgress color="rgba(240, 173, 79, 1)" />
         <Header style={{ position: 'fixed', width: '100%' }}>
           <div className="logo"><Link to="/">API Doc</Link></div>

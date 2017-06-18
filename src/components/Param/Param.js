@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Button } from 'antd';
 import uuidV1 from 'uuid/v1';
+import { fromJS } from 'immutable';
 // import remove from 'lodash/remove';
 // import findIndex from 'lodash/findIndex';
 import Item from './Item';
@@ -9,31 +10,49 @@ import './less/param.less';
 
 class Param extends React.Component {
   static propTypes = {
-    save: PropTypes.func
+    save: PropTypes.func,
+    onChange: PropTypes.func,
+    value: PropTypes.arrayOf(PropTypes.shape({
+
+    }))
   }
 
   static defaultProps = {
-    save: () => { }
+    save: () => { },
+    onChange: () => { },
+    value: undefined
   }
 
 
   constructor(props) {
     super(props);
+    const value = props.value || [];
     this.state = {
-      items: []
+      items: fromJS([...value])
     };
-  }
 
-  // handleAddClick = () => {
-  //   const items = [...this.state.items];
-  //   items.push({ uuid: uuidV1() });
-  //   this.setState({ items });
-  // }
-  handleChange = (changedFields, item) => {
-    Object.keys(changedFields).forEach(key => {
-      item[key] = changedFields[key].value;// eslint-disable-line no-param-reassign
-    });
-    const items = this.state.items.slice();
+    const c = fromJS([
+      { a: 1, c: [{ b: 1 }] },
+      { a: 2, c: [{ b: 3 }] }
+    ]);
+    const b = c.get(1).get('c').get(0).set('b', 5);
+    // const d = c.setIn([1, 'c', 0], { c: 777 });
+    const d = c.updateIn([1, 'c'], arr => arr.push({ c: 888 }));
+    console.log(b.toJS());
+    console.log(d.toJS());
+  }
+  componentWillReceiveProps(nextProps) {
+    // Should be a controlled component.
+    if ('value' in nextProps) {
+      const value = nextProps.value;
+      this.setState(value);
+    }
+  }
+  handleChange = (item, pathIndex) => {
+    const paths = this.getPaths(pathIndex);
+    paths.pop();
+    const items = this.state.items.setIn(paths, item);
+    console.log(items.toJS());
     this.setState({ items });
   }
 
@@ -42,9 +61,9 @@ class Param extends React.Component {
       for (let i = 0; i < items.length; i += 1) {
         const item = items[i];
         if (!item.name) return false;
-        if (item.values) {
-          for (let j = 0; j < item.values.length; j += 1) {
-            if (!item.values[j].value) return false;
+        if (item.itemss) {
+          for (let j = 0; j < item.itemss.length; j += 1) {
+            if (!item.itemss[j].items) return false;
           }
         }
         if (this.validParams(item.children) === false) return false;
@@ -57,38 +76,34 @@ class Param extends React.Component {
     const { items } = this.state;
     if (this.validParams(items)) this.props.save(this.state.items);
   }
-
-  getParent = (items, pathIndex) => {
+  getPaths = (pathIndex) => {
     const paths = [];
+    const res = [];
     pathIndex.split('-').forEach(index => {
       if (index) {
         paths.push(parseInt(index, 0));
+        res.push(parseInt(index, 0));
+        res.push('children');
       }
     });
-    let parent = items;
-    for (let i = 0; i < paths.length - 1; i += 1) {
-      parent = parent[paths[i]].children;
-    }
-    const index = paths[paths.length - 1];
-    return { parent, index, current: parent[index] };
+    return res;
   }
 
   delItem = (pathIndex) => {
-    const items = this.state.items.slice();
-    const { parent, index } = this.getParent(items, pathIndex);
-    parent.splice(index, 1);
+    const paths = this.getPaths(pathIndex);
+    paths.pop();
+    const items = this.state.items.deleteIn(paths);
     this.setState({ items });
   }
   handleAddClick = (pathIndex) => {
-    const items = this.state.items.slice();
-    const item = { uuid: uuidV1() };
+    let items;
+    const item = fromJS({ uuid: uuidV1(), children: [] });
     if (pathIndex) {
-      const { current } = this.getParent(items, pathIndex);
-      if (!current.children) current.children = [];
-      current.children.push(item);
+      items = this.state.items.updateIn(this.getPaths(pathIndex), children => children.push(item));
     } else {
-      items.push(item);
+      items = this.state.items.push(item);
     }
+    console.log(items.toJS());
     this.setState({ items });
   }
 
@@ -98,14 +113,14 @@ class Param extends React.Component {
     const node = (<ul>
       {items.map((item, index) =>
         (<Item
-          key={item.uuid}
+          key={item.get('uuid')}
           del={this.delItem}
           pathIndex={`${preIndex}${index}-`}
           item={item}
           onChange={this.handleChange}
           addSub={this.handleAddClick}
         >
-          {this.getTree(item.children, `${preIndex}${index}-`, level + 1)}
+          {this.getTree(item.get('children'), `${preIndex}${index}-`, level + 1)}
         </Item>))
       }
     </ul>);
@@ -119,7 +134,6 @@ class Param extends React.Component {
       <div className="param">
         {this.getTree(items)}
         <Button onClick={() => { this.handleAddClick(); }}>添加</Button>
-        <Button type="primary" onClick={this.handleSaveClick}>保存</Button>
       </div>
     );
   }

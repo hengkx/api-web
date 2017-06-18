@@ -1,10 +1,12 @@
 /* eslint jsx-a11y/label-has-for: 0 */
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Input, Checkbox, Form, Icon } from 'antd';
+import { Input, Checkbox, Button, Form, Icon, Radio } from 'antd';
 import './less/value.less';
+import './less/form-item.less';
 
 const FormItem = Form.Item;
+
 
 class Value extends React.Component {
 
@@ -48,31 +50,23 @@ class Value extends React.Component {
   }
 
   render() {
-    const { getFieldDecorator } = this.props.form;
     return (
       <div className="value">
-        <Form layout="inline">
-          <FormItem>
-            <Icon onClick={this.handleDelClick} type="minus-circle-o" />
-          </FormItem>
-          <FormItem>
-            {getFieldDecorator('value', {
-              rules: [{ required: true, message: '请输入值!' }],
-            })(<Input />)}
-          </FormItem>
-          <FormItem
-            label="字段说明"
-          >
-            {getFieldDecorator('type')(<Input />)}
-          </FormItem>
-          <FormItem
-            label="默认"
-          >
-            {getFieldDecorator('default', {
-              valuePropName: 'checked'
-            })(<Checkbox />)}
-          </FormItem>
-        </Form>
+        <div className="form-item">
+          <label className="required">参数值</label>
+          <Input />
+        </div>
+        <div className="form-item">
+          <label>值说明</label>
+          <Input />
+        </div>
+        <div className="form-item" style={{ width: '.8rem' }}>
+          <label>默认</label>
+          <Checkbox />
+        </div>
+        <div className="oper">
+          <Button type="danger" onClick={this.handleDelClick}>删除</Button>
+        </div>
       </div>
     );
   }
