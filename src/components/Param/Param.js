@@ -31,15 +31,15 @@ class Param extends React.Component {
       items: fromJS([...value])
     };
 
-    const c = fromJS([
-      { a: 1, c: [{ b: 1 }] },
-      { a: 2, c: [{ b: 3 }] }
-    ]);
-    const b = c.get(1).get('c').get(0).set('b', 5);
-    // const d = c.setIn([1, 'c', 0], { c: 777 });
-    const d = c.updateIn([1, 'c'], arr => arr.push({ c: 888 }));
-    console.log(b.toJS());
-    console.log(d.toJS());
+    // const c = fromJS([
+    //   { a: 1, c: [{ b: 1 }] },
+    //   { a: 2, c: [{ b: 3 }] }
+    // ]);
+    // const b = c.get(1).get('c').get(0).set('b', 5);
+    // // const d = c.setIn([1, 'c', 0], { c: 777 });
+    // const d = c.updateIn([1, 'c'], arr => arr.push({ c: 888 }));
+    // console.log(b.toJS());
+    // console.log(d.toJS());
   }
   componentWillReceiveProps(nextProps) {
     // Should be a controlled component.
@@ -97,7 +97,7 @@ class Param extends React.Component {
   }
   handleAddClick = (pathIndex) => {
     let items;
-    const item = fromJS({ uuid: uuidV1(), children: [] });
+    const item = fromJS({ uuid: uuidV1(), values: [], children: [] });
     if (pathIndex) {
       items = this.state.items.updateIn(this.getPaths(pathIndex), children => children.push(item));
     } else {
@@ -108,7 +108,7 @@ class Param extends React.Component {
   }
 
   getTree = (items, preIndex = '', level = 0) => {
-    if (!items) return;
+    if (!items || items.length === 0) return null;
 
     const node = (<ul>
       {items.map((item, index) =>

@@ -1,32 +1,21 @@
 /* eslint jsx-a11y/label-has-for: 0 */
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Form, Icon, Input, Select, Button, Radio } from 'antd';
-import remove from 'lodash/remove';
-import findIndex from 'lodash/findIndex';
+import { Input, Button, Radio } from 'antd';
 import uuidV1 from 'uuid/v1';
 import { Map, fromJS } from 'immutable';
 import Value from './Value';
+import withBase from '../Base';
 import './less/item.less';
 import './less/form-item.less';
 
-const FormItem = Form.Item;
-const InputGroup = Input.Group;
 const RadioButton = Radio.Button;
 const RadioGroup = Radio.Group;
-const Option = Select.Option;
 const paramTypes = ['string', 'object', 'number', 'boolean', 'datetime'];
 
 class Item extends React.Component {
 
   static propTypes = {
-    form: PropTypes.shape({
-      validateFields: PropTypes.func.isRequired,
-      getFieldDecorator: PropTypes.func.isRequired,
-      setFieldsValue: PropTypes.func.isRequired,
-      resetFields: PropTypes.func.isRequired,
-      getFieldsValue: PropTypes.func.isRequired,
-    }).isRequired,
     item: PropTypes.instanceOf(Map).isRequired,
     del: PropTypes.func.isRequired,
     onChange: PropTypes.func.isRequired,
@@ -42,11 +31,7 @@ class Item extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      values: [],
-      item: props.item,
-      // name: '',
-      // type: 'string',
-      // remark: ''
+      item: props.item
     };
   }
   componentWillReceiveProps(nextProps) {
@@ -61,31 +46,19 @@ class Item extends React.Component {
   // }
 
   handleAddValueClick = () => {
-    const values = [...this.state.values];
-    values.push({ uuid: uuidV1() });
-    this.setState({ values });
+    const item = this.state.item.update('values', arr => arr.push(fromJS({ uuid: uuidV1() })));
+    this.setState({ item });
   }
 
-  delValue = (value) => {
-    const values = [...this.state.values];
-    remove(values, { uuid: value.uuid });
-    this.setState({ values });
+  delValue = (index) => {
+    const item = this.state.item.deleteIn(['values', index]);
+    this.setState({ item });
   }
-  handleFieldChange = (changedFields, uuid) => {
-    const values = this.state.values.slice();
-    let index = findIndex(values, { uuid });
-    const value = values[index];
-    if (changedFields.default && changedFields.default.value) {
-      index = findIndex(values, { default: true });
-      if (index !== -1) {
-        values[index].default = false;
-      }
-    }
-    Object.keys(changedFields).forEach(key => {
-      value[key] = changedFields[key].value;
-    });
-    this.setState({ values });
-    this.props.onChange({ values: { value: values } }, this.props.item);
+  handleValueChange = (value, index) => {
+    let item = this.state.item.update('values', values => values.map(val => val.set('default', false)));
+    item = item.setIn(['values', index], value);
+    this.setState({ item });
+    this.props.onChange(item, this.props.pathIndex);
   }
 
   handleDelClick = () => {
@@ -95,59 +68,46 @@ class Item extends React.Component {
   handleAddSubClick = () => {
     this.props.addSub(this.props.pathIndex);
   }
-  handleNameChange = (e) => {
+  handleChange = (e) => {
     const { item } = this.state;
-    this.setState({ item: item.set('name', e.target.value) });
-    this.change();
-  }
-  handleRemarkChange = (e) => {
-    const { item } = this.state;
-    this.setState({ item: item.set('remark', e.target.value) });
-    this.change();
-  }
-  handleTypeChange = (e) => {
-    const { item } = this.state;
-    this.setState({ item: item.set('type', e.target.value) });
-    this.change();
-  }
-
-  change = () => {
+    this.setState({ item: item.set(e.target.name, e.target.value) });
     this.props.onChange(this.state.item, this.props.pathIndex);
   }
 
   render() {
-    const { item, values } = this.state;
+    const { item } = this.state;
+    console.count('item render');
     return (
       <li className="item">
         <div>
           <div>
             <div className="form-item">
               <label className="required">参数名称</label>
-              <Input value={item.get('name')} onChange={this.handleNameChange} />
+              <Input name="name" value={item.get('name')} onChange={this.handleChange} />
               <Button type="danger" onClick={this.handleDelClick}>删除</Button>
               <Button onClick={this.handleAddSubClick}>添加子项</Button>
             </div>
             <div className="form-item">
               <label className="required">参数类型</label>
-              <RadioGroup value={item.get('type')} onChange={this.handleTypeChange}>
+              <RadioGroup value={item.get('type')} onChange={this.handleChange}>
                 {paramTypes.map(paramType =>
-                  <RadioButton key={paramType} value={paramType}>{paramType}</RadioButton>)}
+                  <RadioButton name="type" key={paramType} value={paramType}>{paramType}</RadioButton>)}
               </RadioGroup>
             </div>
             <div className="form-item">
               <label >参数说明</label>
-              <Input value={item.get('remark')} onChange={this.handleRemarkChange} />
+              <Input name="remark" value={item.get('remark')} onChange={this.handleChange} />
             </div>
           </div>
           <div className="form-item">
             <label>值可能性</label>
             <div>
-              {values.map(value => (<Value
+              {item.get('values').map((value, index) => (<Value
                 del={this.delValue}
-                key={value.uuid}
+                key={value.get('uuid')}
                 value={value}
-                default={value.default}
-                onChange={this.handleFieldChange}
+                index={index}
+                onChange={this.handleValueChange}
               />))}
               <Button onClick={this.handleAddValueClick}>添加值</Button>
             </div>
@@ -161,8 +121,4 @@ class Item extends React.Component {
   }
 }
 
-export default Form.create({
-  onFieldsChange(props, changedFields) {
-    props.onChange(changedFields, props.item);
-  }
-})(Item);
+export default withBase(Item);
