@@ -52,7 +52,6 @@ class Value extends React.Component {
   }
 
   render() {
-    console.count('value render');
     const { value } = this.state;
     return (
       <div className="value">

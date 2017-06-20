@@ -24,6 +24,7 @@ module.exports = {
         "react/sort-comp": ["error", {
             "order": ["type-annotations", "static-methods", "lifecycle", "everything-else", "render"]
         }],
+        "react/require-default-props": "off",
         "react/jsx-no-bind": "off",
         "react/forbid-prop-types": "off",
         "react/jsx-filename-extension": ["error", { "extensions": [".js", ".jsx"] }],

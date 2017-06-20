@@ -18,7 +18,13 @@ class Add extends React.Component {
 
   static defaultProps = {
   };
-
+  handleSaveClick = () => {
+    this.props.form.validateFields((err, values) => {
+      if (!err) {
+        console.log('Received values of form: ', values);
+      }
+    });
+  }
   render() {
     const formItemLayout = {
       labelCol: { span: 4 },
@@ -48,15 +54,16 @@ class Add extends React.Component {
             label="请求参数"
             {...formItemLayout}
           >
-            <Param />
-            {/* {getFieldDecorator('requestParams')(<Param />)}*/}
+            {getFieldDecorator('requestParams')(<Param />)}
           </FormItem>
           <FormItem
             label="响应参数"
             {...formItemLayout}
           >
-            <Param />
-            {/* {getFieldDecorator('responseParams')(<Param />)}*/}
+            {getFieldDecorator('responseParams')(<Param />)}
+          </FormItem>
+          <FormItem>
+            <Button type="primary" onClick={this.handleSaveClick}>保存</Button>
           </FormItem>
         </Form>
       </div>

@@ -11,22 +11,22 @@ function withBase(WrappedComponent) {
       const thisState = this.state || {};
       if (Object.keys(thisProps).length !== Object.keys(nextProps).length ||
         Object.keys(thisState).length !== Object.keys(nextState || {}).length) {
-        console.log('keys');
+        // console.log('keys');
         return true;
       }
 
       //  Object.keys(nextProps).forEach((key)=>);
       for (const key in nextProps) {
         if (!is(thisProps[key], nextProps[key])) {
-          console.log('nextProps', key, thisProps);
-          console.log('nextProps', nextProps);
+          // console.log('nextProps', key, thisProps);
+          // console.log('nextProps', nextProps);
           return true;
         }
       }
 
       for (const key in nextState) {
         if (thisState[key] !== nextState[key] || !is(thisState[key], nextState[key])) {
-          console.log('nextState');
+          // console.log('nextState');
           return true;
         }
       }

@@ -20,7 +20,7 @@ class Param extends React.Component {
   static defaultProps = {
     save: () => { },
     onChange: () => { },
-    value: undefined
+    // value: undefined
   }
 
 
@@ -42,18 +42,16 @@ class Param extends React.Component {
     // console.log(d.toJS());
   }
   componentWillReceiveProps(nextProps) {
-    // Should be a controlled component.
-    if ('value' in nextProps) {
-      const value = nextProps.value;
-      this.setState(value);
-    }
+    console.log(nextProps.value);
   }
+
   handleChange = (item, pathIndex) => {
     const paths = this.getPaths(pathIndex);
     paths.pop();
     const items = this.state.items.setIn(paths, item);
     console.log(items.toJS());
     this.setState({ items });
+    this.props.onChange(items.toJS());
   }
 
   validParams = (items) => {
@@ -97,7 +95,7 @@ class Param extends React.Component {
   }
   handleAddClick = (pathIndex) => {
     let items;
-    const item = fromJS({ uuid: uuidV1(), values: [], children: [] });
+    const item = fromJS({ uuid: uuidV1(), type: 'string', values: [], children: [] });
     if (pathIndex) {
       items = this.state.items.updateIn(this.getPaths(pathIndex), children => children.push(item));
     } else {
