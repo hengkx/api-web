@@ -1,0 +1,117 @@
+* {
+    outline: 0;
+}
+
+[data-reactroot] {
+    height: 100% !important;
+}
+
+ul {
+    list-style: none;
+    padding: 0;
+}
+
+@import "~antd/lib/style/themes/default.less";
+.right {
+    float: right;
+    height: 100%;
+    .action {
+        cursor: pointer;
+        padding: 0 12px;
+        display: inline-block;
+        transition: all .3s;
+        height: 100%;
+        >i {
+            font-size: 16px;
+            vertical-align: middle;
+        }
+        &:global(.ant-popover-open),
+        &:hover {
+            background: @primary-1;
+        }
+    }
+    .search {
+        padding: 0;
+        margin: 0 12px;
+        &:hover {
+            background: transparent;
+        }
+    }
+    .header-account {
+        .avatar {
+            margin: 20px 8px 20px 0;
+            color: @primary-color;
+            background: rgba(255, 255, 255, .85);
+            vertical-align: middle;
+        }
+    }
+}
+
+.container {
+    display: flex;
+    height: 100%;
+    flex-direction: column;
+    background-color: #f5f5f5;
+}
+
+.header {
+    padding: 0 12px 0 0;
+    background: #fff; // box-shadow: 0 1px 4px rgba(0, 21, 41, 0.08);
+    border-bottom: 1px solid #e5e5e5;
+    position: relative;
+}
+
+.trigger {
+    font-size: 18px;
+    line-height: 64px;
+    padding: 0 24px;
+    cursor: pointer;
+    transition: color .3s;
+    &:hover {
+        color: #1890ff;
+    }
+}
+
+.logo {
+    height: 32px;
+    background: rgba(255, 255, 255, .2);
+    margin: 16px;
+}
+
+.react-contextmenu {
+    z-index: 999;
+    background-color: #fff;
+    opacity: 0;
+    color: #999;
+    border-radius: 2px;
+    box-shadow: 0px 1px 16px 0 rgba(90, 109, 122, 0.41);
+    padding: 0px 0px;
+    border-radius: 2px;
+    width: 120px;
+    &.react-contextmenu--visible {
+        opacity: 1;
+        pointer-events: auto;
+    }
+    .react-contextmenu-item {
+        line-height: 30px;
+        padding: 0 20px;
+        &:hover {
+            color: #76b0f3;
+            background: #f4f9ff;
+            cursor: pointer;
+        }
+    }
+    .react-contextmenu-item--divider {
+        background: #ebf3fd;
+        height: 1px;
+    }
+    .react-contextmenu-item.react-contextmenu-submenu {
+        padding: 0;
+    }
+    .react-contextmenu-item.react-contextmenu-submenu>.react-contextmenu-item:after {
+        content: "▶";
+        display: inline-block;
+        position: absolute;
+        right: 7px;
+    }
+}

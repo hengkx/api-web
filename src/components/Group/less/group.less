@@ -1,0 +1,28 @@
+.group {
+    .group-header {
+        height: 36px;
+        text-align: center;
+        line-height: 36px;
+        font-size: 16px;
+    }
+    .group-tree {
+        .ant-tree-node-content-wrapper {
+            width: calc(100%-18px);
+        }
+        .group-item {
+            display: flex;
+            .react-contextmenu-wrapper {
+                flex: 1;
+            }
+            .action {
+                display: none;
+                width: 20px;
+            }
+            &:hover {
+                .action {
+                    display: block;
+                }
+            }
+        }
+    }
+}
