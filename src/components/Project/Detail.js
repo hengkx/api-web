@@ -1,16 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { message, Button, Form, Input } from 'antd';
+import { Button, Form, Input } from 'antd';
 import { Route, NavLink } from 'react-router-dom';
 import Interface from '../../containers/Interface';
 import InterfaceAdd from '../../containers/InterfaceAdd';
 import InterfaceEdit from '../../containers/InterfaceEdit';
 import InterfaceDetail from '../../containers/InterfaceDetail';
 import ProjectSetting from '../../containers/ProjectSetting';
+import ProjectMember from '../../containers/ProjectMember';
+import ProjectLog from '../../containers/ProjectLog';
 import './less/detail.less';
-
-const FormItem = Form.Item;
-const TextArea = Input.TextArea;
 
 class Detail extends React.Component {
   static propTypes = {
@@ -45,8 +44,8 @@ class Detail extends React.Component {
     if (getGroupResult !== this.props.getGroupResult) {
       this.setState({ groups: getGroupResult.data });
     }
-
   }
+
   handleTabChange = (key) => {
     this.setState({ tab: key });
   }
@@ -80,12 +79,19 @@ class Detail extends React.Component {
     return (
       <div className="project-detail">
         <ul className="sidebar">
-          <li><NavLink activeClassName="active" to={`${match.url}/api`}>接口列表</NavLink></li>
-          <li><NavLink activeClassName="active" to={`${match.url}/db`}>数据库</NavLink></li>
+          <li><NavLink activeClassName="active" to={`${match.url}/api`}>API接口</NavLink></li>
+          <li><NavLink activeClassName="active" to={`${match.url}/api1`}>状态码</NavLink></li>
+          <li><NavLink activeClassName="active" to={`${match.url}/db`}>数据模型</NavLink></li>
+          <li><NavLink activeClassName="active" to={`${match.url}/setting`}>项目文档</NavLink></li>
+          <li><NavLink activeClassName="active" to={`${match.url}/setting`}>环境管理</NavLink></li>
+          <li><NavLink activeClassName="active" to={`${match.url}/member`}>协作管理</NavLink></li>
+          <li><NavLink activeClassName="active" to={`${match.url}/log`}>项目动态</NavLink></li>
           <li><NavLink activeClassName="active" to={`${match.url}/setting`}>设置</NavLink></li>
         </ul>
         <div className="project-content">
           <Route exact path={`${match.path}/setting`} component={ProjectSetting} />
+          <Route exact path={`${match.path}/member`} component={ProjectMember} />
+          <Route exact path={`${match.path}/log`} component={ProjectLog} />
           <Route exact path={`${match.path}/api`} component={Interface} />
           <Route exact path={`${match.path}/api/edit`} component={InterfaceAdd} />
           <Route exact path={`${match.path}/api/edit/:interfaceId`} component={InterfaceEdit} />
