@@ -1,7 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Layout, Menu, Icon, Dropdown, Avatar, Spin } from 'antd';
+import { Layout, Menu, Icon as AntdIcon, Dropdown, Avatar, Spin } from 'antd';
 import { parse as urlParse } from 'url';
+import { Icon } from 'react-fa';
 import { Route, Link } from 'react-router-dom';
 import NoticeIcon from 'ant-design-pro/lib/NoticeIcon';
 import Project from '../../containers/Project';
@@ -46,10 +47,10 @@ class Main extends React.Component {
   render() {
     const menu = (
       <Menu className="menu" selectedKeys={[]} onClick={this.onMenuClick}>
-        <Menu.Item disabled><Icon type="user" />个人中心</Menu.Item>
-        <Menu.Item disabled><Icon type="setting" />设置</Menu.Item>
+        <Menu.Item disabled><AntdIcon type="user" />个人中心</Menu.Item>
+        <Menu.Item disabled><AntdIcon type="setting" />设置</Menu.Item>
         <Menu.Divider />
-        <Menu.Item key="logout"><Icon type="logout" />退出登录</Menu.Item>
+        <Menu.Item key="logout"><AntdIcon type="logout" />退出登录</Menu.Item>
       </Menu>
     );
     const currentUser = {};
@@ -59,6 +60,7 @@ class Main extends React.Component {
       <div className="container">
         <Header className="header">
           <Link to="/project">首页</Link>
+          <Icon name="rocket" />
           <div className="right">
             <NoticeIcon
               className="action"

@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { Select, Input, Card, message } from 'antd';
 import PageHeaderLayout from '../PageHeaderLayout';
 import Param from '../../containers/Param';
+import ParamNew from '../ParamNew';
 import ParamSelect from '../Select';
 
 const Option = Select.Option;
@@ -95,6 +96,9 @@ class Edit extends React.Component {
         {user._id !== project.user &&
           <div style={{ position: 'absolute', width: '100%', height: '100%', zIndex: 9999 }} />
         }
+        <Card title="test" style={{ marginBottom: 24 }} bordered={false}>
+          <ParamNew />
+        </Card>
         <Card title="基础信息" style={{ marginBottom: 24 }} bordered={false}>
           <Input
             value={api.name}

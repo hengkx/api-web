@@ -6,7 +6,7 @@ import ip from 'ip';
 import baseConfig from './webpack.config.base';
 import theme from './themes/theme';
 
-const host = ip.address();
+const host = 'localhost';// ip.address();
 const port = 5005;
 
 export default webpackMerge(baseConfig, {
