@@ -1,5 +1,121 @@
 .paramNew {
     .row {
+        display: flex;
+        position: relative;
+        &-wrapper {
+            width: 100%;
+        }
+        &-inner {
+            padding: 4px 0;
+            position: relative;
+            display: flex;
+            width: 100%;
+        }
+        &-meta-item {
+            color: #999;
+            padding-right: 20px;
+            position: relative;
+        }
+        &-collapse-handle {
+            position: relative;
+            &-inner {
+                width: 25px;
+                position: absolute;
+                top: 0;
+                bottom: 0;
+                left: -22px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                &:hover {
+                    background-color: rgba(0, 0, 0, 0.05);
+                    color: #3b99fc;
+                    cursor: pointer;
+                }
+            }
+        }
+        .remove {
+            cursor: pointer;
+            width: 24px;
+            top: 0;
+        }
+        .detail,
+        .add {
+            color: #999;
+            height: 25px;
+            width: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: absolute;
+            z-index: 10;
+            &:hover {
+                color: #e040fb;
+                background-color: rgba(0, 0, 0, 0.05);
+                cursor: pointer;
+                z-index: 10;
+                opacity: 1;
+            }
+        }
+        .add {
+            top: 4px;
+            left: 28px;
+        }
+        .detail {
+            top: 4px;
+            left: 5px;
+        }
+        .name {
+            display: flex;
+            input {
+                box-sizing: content-box;
+                border: none;
+                background-color: transparent;
+                padding: 2px 4px;
+            }
+        }
+        .type {
+            position: relative;
+            flex: 1;
+            &-selector {
+                position: absolute;
+                z-index: 50;
+                top: 140%;
+                left: -20px;
+                background-color: #f9f9f9;
+                border: 1px solid #ddd;
+                width: 350px;
+                display: none;
+                &-caret {
+                    position: absolute;
+                    top: -13px;
+                    left: 30px;
+                    color: #ddd;
+                    font-size: 18px;
+                }
+            }
+        }
+        .row-details-section {
+            padding: 8px 10px;
+            width: 100%;
+            &-name {
+                text-transform: uppercase;
+                color: #999;
+                font-size: 0.8em;
+            }
+            &-items {
+                padding-top: 5px;
+                margin-left: -6px;
+                flex-wrap: wrap;
+                display: flex;
+            }
+            &-item {
+                padding: 2px 6px;
+                border-radius: 0px;
+                margin: 2px 0 2px 2px;
+                justify-content: center;
+            }
+        }
         &:hover {
             background-color: rgba(59, 153, 252, 0.06);
         }
@@ -93,4 +209,8 @@
 .t--ref.on {
     color: #fff;
     background-color: #8a2be2
+}
+
+.t--spacer {
+    margin: 0 10px 0 1px;
 }
