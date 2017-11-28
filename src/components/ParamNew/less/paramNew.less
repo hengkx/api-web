@@ -1,4 +1,8 @@
 .paramNew {
+    border: 1px solid #eee;
+    height: 300px;
+    display: flex;
+    flex-direction: column;
     .row {
         display: flex;
         position: relative;
@@ -21,7 +25,7 @@
             &-inner {
                 width: 25px;
                 position: absolute;
-                top: 0;
+                top: -3px;
                 bottom: 0;
                 left: -22px;
                 display: flex;
@@ -49,6 +53,7 @@
             justify-content: center;
             position: absolute;
             z-index: 10;
+            top: 2px;
             &:hover {
                 color: #e040fb;
                 background-color: rgba(0, 0, 0, 0.05);
@@ -58,11 +63,9 @@
             }
         }
         .add {
-            top: 4px;
             left: 28px;
         }
         .detail {
-            top: 4px;
             left: 5px;
         }
         .name {
@@ -77,6 +80,8 @@
         .type {
             position: relative;
             flex: 1;
+            display: flex;
+            cursor: pointer;
             &-selector {
                 position: absolute;
                 z-index: 50;
@@ -85,7 +90,6 @@
                 background-color: #f9f9f9;
                 border: 1px solid #ddd;
                 width: 350px;
-                display: none;
                 &-caret {
                     position: absolute;
                     top: -13px;
@@ -95,29 +99,75 @@
                 }
             }
         }
-        .row-details-section {
-            padding: 8px 10px;
-            width: 100%;
-            &-name {
-                text-transform: uppercase;
-                color: #999;
-                font-size: 0.8em;
-            }
-            &-items {
-                padding-top: 5px;
-                margin-left: -6px;
-                flex-wrap: wrap;
-                display: flex;
-            }
-            &-item {
-                padding: 2px 6px;
-                border-radius: 0px;
-                margin: 2px 0 2px 2px;
-                justify-content: center;
-            }
-        }
         &:hover {
             background-color: rgba(59, 153, 252, 0.06);
+        }
+    }
+}
+
+.panel-header {
+    position: relative;
+    border-bottom: none;
+    display: flex;
+    .tab-bar {
+        border-bottom: 1px solid #e7e7e7;
+        position: relative;
+        z-index: 8;
+        display: flex;
+        min-height: 0;
+        align-items: center;
+        flex: 1;
+    }
+    .tabs {
+        display: flex;
+        .tab {
+            cursor: pointer;
+            border-right: 1px solid transparent;
+            text-transform: capitalize;
+            height: 28px;
+            padding: 0 15px;
+            border-color: #e7e7e7;
+            position: relative;
+            z-index: 5;
+            align-items: center;
+            display: flex;
+            &.on {
+                cursor: default;
+                background: #fff;
+                color: #3b99fc;
+            }
+        }
+    }
+}
+
+.panel-content {
+    padding: 20px 0;
+    flex: 1;
+    overflow-y: auto;
+}
+
+.row-details-section {
+    padding: 8px 10px;
+    width: 100%;
+    &-name {
+        text-transform: uppercase;
+        color: #999;
+        font-size: 0.8em;
+    }
+    &-items {
+        padding-top: 5px;
+        margin-left: -6px;
+        flex-wrap: wrap;
+        display: flex;
+    }
+    &-item {
+        padding: 2px 6px;
+        border-radius: 0px;
+        margin: 2px 0 2px 2px;
+        justify-content: center;
+        &:hover {
+            background-color: #eee;
+            cursor: pointer;
         }
     }
 }

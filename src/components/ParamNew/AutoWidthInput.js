@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 class AutoWidthInput extends React.Component {
-
   static propTypes = {
     value: PropTypes.string,
     placeholder: PropTypes.string,

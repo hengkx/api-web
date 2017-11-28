@@ -97,7 +97,7 @@ class Edit extends React.Component {
           <div style={{ position: 'absolute', width: '100%', height: '100%', zIndex: 9999 }} />
         }
         <Card title="test" style={{ marginBottom: 24 }} bordered={false}>
-          <ParamNew />
+          <ParamNew params={api.req_params} />
         </Card>
         <Card title="基础信息" style={{ marginBottom: 24 }} bordered={false}>
           <Input

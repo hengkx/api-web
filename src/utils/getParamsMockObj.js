@@ -34,13 +34,7 @@ function getParamsMockObj(params) {
     }
     if (item.type.indexOf('Object') !== -1 && item.children) {
       if (item.type === '[Object]') {
-        const arr = [];
-        let i = 0;
-        while (i < 3) {
-          arr.push(getParamsMockObj(item.children));
-          i += 1;
-        }
-        value = arr;
+        value = [getParamsMockObj(item.children)];
       } else {
         value = getParamsMockObj(item.children);
       }

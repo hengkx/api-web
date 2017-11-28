@@ -1,89 +1,82 @@
 import React from 'react';
 import { Icon } from 'react-fa';
 import AutoWidthInput from './AutoWidthInput';
+import SelectType from './SelectType';
 import './less/paramNew.less';
 
 class ParamNew extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      params: [{ type: 'Object' }]
+      params: props.params || [{ type: 'Object' }]
     };
   }
-  handleAddClick = (item) => {
-    if (!item.children) item.children = [];// eslint-disable-line no-param-reassign
-    item.children.push({ type: 'String' });
 
-    const { params } = this.state;
-    this.setState(params);
-  }
-  handleNameChange = (param, e) => {
-    param.name = e.target.value;// eslint-disable-line no-param-reassign
-    const { params } = this.state;
-    this.setState(params);
-  }
-  componentDidUpdate() {
-    if (this.sizer) {
-
-      const width = Math.max(this.sizer.scrollWidth, this.placeholderSizer.scrollWidth);
-      console.log(width);
+  componentWillReceiveProps(nextProps) {
+    const { params } = nextProps;
+    if (params !== this.props.params) {
+      this.setState({ params });
     }
   }
 
-  getWidth = (param) => {
-    if (!this.sizer) return 30;
 
-    const width = Math.max(this.sizer.scrollWidth, this.placeholderSizer.scrollWidth);
-
-    return width + 2;
+  handleAddClick = (item) => {
+    if (!item.children) item.children = [];// eslint-disable-line no-param-reassign
+    item.children.push({ type: 'String' });
+    item.open = true;// eslint-disable-line no-param-reassign
+    this.forceUpdate();
   }
-
+  handleNameChange = (param, e) => {
+    param.name = e.target.value;// eslint-disable-line no-param-reassign
+    this.forceUpdate();
+  }
+  handleTypeChange = (param, type) => {
+    param.type = type;// eslint-disable-line no-param-reassign
+    this.forceUpdate();
+  }
+  handleCollapseClick = (param) => {
+    param.open = !param.open;// eslint-disable-line no-param-reassign
+    this.forceUpdate();
+  }
   renderParam = (params, level = 0, padding = 55) => {
-    const types = ['Object', 'String', 'Number', 'Boolean', 'File', '$Ref', 'Variable'];
     const res = [];
-    params.forEach(param => {
+    params.forEach((param, index) => {
       res.push((
-        <div key={param.type} className="row">
+        <div key={`${level}-${index}`} className="row">
           <div className="detail">
             <Icon name="pencil" />
           </div>
-          <div className="add" onClick={() => this.handleAddClick(param)}>
-            <Icon name="plus" />
-          </div>
+          {(param.type === 'Object' || param.type === '[Object]') &&
+            <div className="add" onClick={() => this.handleAddClick(param)}>
+              <Icon name="plus" />
+            </div>
+          }
           <div className="row-wrapper">
             <div className="row-inner" style={{ paddingLeft: padding }}>
-              {level !== 0 &&
-                <div className="row-collapse-handle">
+              {level !== 0 && (param.type === 'Object' || param.type === '[Object]') &&
+                <div className="row-collapse-handle" onClick={() => this.handleCollapseClick(param)}>
                   <div className="row-collapse-handle-inner">
-                    <Icon name="caret-right" />
+                    <Icon name={`caret-${param.open ? 'down' : 'right'}`} />
                   </div>
                 </div>
               }
-              <div className="name">
-                <AutoWidthInput
-                  placeholder="field"
-                  value={param.name || ''}
-                  onChange={e => this.handleNameChange(param, e)}
-                />
-              </div>
-              <div className="type ">
-                <span className="t--spacer">:</span>
-                <span className={`t--${param.type.toLowerCase()}`}>{param.type}</span>
-                <div className="type-selector">
-                  <div className="row-details-section">
-                    <div className="row-details-section-name">基本类型</div>
-                    <div className="row-details-section-items sl--box-list f">
-                      {types.map(item => <div key={item} className="row-details-section-item f-0 f ai-c jc-c sl--array on">{item}</div>)}
-                    </div>
-                  </div>
-                  <div className="row-details-section">
-                    <div className="row-details-section-name">数组类型</div>
-                    <div className="row-details-section-items sl--box-list f">
-                      {types.map(item => <div key={`[${item}]`} className="row-details-section-item f-0 f ai-c jc-c sl--array on">[{item}]</div>)}
-                    </div>
-                  </div>
-                  <Icon name="caret-up" className="type-selector-caret" />
+              {level !== 0 &&
+                <div className="name">
+                  <AutoWidthInput
+                    placeholder="field"
+                    value={param.name || ''}
+                    onChange={e => this.handleNameChange(param, e)}
+                  />
                 </div>
+              }
+              <div className="type">
+                {level !== 0 &&
+                  <span className="t--spacer">:</span>
+                }
+                <SelectType
+                  value={param.type}
+                  onChange={(type) => this.handleTypeChange(param, type)}
+                />
               </div>
               {level !== 0 &&
                 <div className="row-meta-item">
@@ -96,7 +89,7 @@ class ParamNew extends React.Component {
           </div>
         </div>
       ));
-      if (param.children) {
+      if (param.open && param.children) {
         res.push([...this.renderParam(param.children, level + 1, padding + 20)]);
       }
     });
@@ -104,12 +97,19 @@ class ParamNew extends React.Component {
   }
   render() {
     const { params } = this.state;
-    if (this.div) {
-      console.log(this.div.scrollWidth);
-    }
     return (
       <div className="paramNew">
-        {this.renderParam(params)}
+        <div className="panel-header">
+          <div className="tab-bar">
+            <div className="tabs">
+              <div className="tab on">编辑</div>
+              <div className="tab">例子</div>
+            </div>
+          </div>
+        </div>
+        <div className="panel-content">
+          {this.renderParam(params)}
+        </div>
       </div>
     );
   }

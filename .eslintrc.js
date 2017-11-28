@@ -29,6 +29,7 @@ module.exports = {
     "jsx-a11y/href-no-hash": "off",
     "jsx-a11y/no-static-element-interactions": "off",
     "jsx-a11y/no-noninteractive-tabindex": "off",
+    "jsx-a11y/click-events-have-key-events": "off",
     "react/jsx-no-bind": "off",
     "react/require-default-props": "off",
     "react/forbid-prop-types": "off",
